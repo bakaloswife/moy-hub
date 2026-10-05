@@ -319,6 +319,53 @@ h1{font-size:30px;line-height:1.05;margin:0;letter-spacing:-.02em}
       </a>
       <button class="chip" id="addDonkatsuToShopping" type="button" style="margin-top:10px">Добавить недостающее в покупки</button>
     </div>
+
+    <div class="card">
+      <h3>Лазанья для очень ленивых</h3>
+      <div class="subtle">Ленивая лазанья на одной сковороде: фарш, томатный соус, листы лазаньи, сливки и много сыра.</div>
+
+      <div class="group"><div class="group-title">Ингредиенты</div>
+        <div class="steps">
+          <div class="step">Фарш — 400–500 г</div>
+          <div class="step">Репчатый лук — 1 шт.</div>
+          <div class="step">Чеснок — 2–3 зубчика</div>
+          <div class="step">Оливковое масло — для жарки</div>
+          <div class="step">Томатная паста — 1 ст. л.</div>
+          <div class="step">Томатный соус для пасты — 1 банка, около 350–400 г</div>
+          <div class="step">Говяжий или куриный бульон — около 200–250 мл</div>
+          <div class="step">Сливки 10–20% — около 100 мл</div>
+          <div class="step">Листы для лазаньи — 6–8 шт.</div>
+          <div class="step">Пармезан — по вкусу</div>
+          <div class="step">Моцарелла — по вкусу</div>
+          <div class="step">Орегано — по вкусу</div>
+          <div class="step">Базилик — по вкусу</div>
+          <div class="step">Соль — по вкусу</div>
+          <div class="step">Чёрный перец — по вкусу</div>
+          <div class="step">Петрушка — для подачи</div>
+        </div>
+      </div>
+
+      <div class="group"><div class="group-title">Как готовить</div>
+        <div class="steps">
+          <div class="step"><b>1.</b> Мелко нарезать репчатый лук.</div>
+          <div class="step"><b>2.</b> Разогреть оливковое масло на сковороде, добавить фарш, соль и чёрный перец. Обжаривать, помешивая.</div>
+          <div class="step"><b>3.</b> Добавить лук. Когда он размягчится, добавить натёртый чеснок и обжарить до появления аромата.</div>
+          <div class="step"><b>4.</b> Добавить томатную пасту, орегано и базилик. Хорошо перемешать.</div>
+          <div class="step"><b>5.</b> Влить томатный соус, затем добавить бульон и немного сливок.</div>
+          <div class="step"><b>6.</b> Дождаться закипания и поломать листы лазаньи на удобные кусочки.</div>
+          <div class="step"><b>7.</b> Опустить листы в соус, слегка утапливая их. Накрыть крышкой и тушить 15 минут.</div>
+          <div class="step"><b>8.</b> Посыпать пармезаном и моцареллой, сверху добавить ещё немного сливок.</div>
+          <div class="step"><b>9.</b> Снова накрыть крышкой и подержать до полного расплавления сыра.</div>
+          <div class="step"><b>10.</b> Перед подачей посыпать свежей петрушкой.</div>
+        </div>
+      </div>
+
+      <a class="video" href="https://youtube.com/shorts/1BluHGfkJN0?si=d5_iDLXBlAFP-Cc4" target="_blank" rel="noopener noreferrer">
+        <div class="video-title">Видео-рецепт</div>
+        <div class="video-link">Открыть на YouTube ↗</div>
+      </a>
+      <button class="chip" id="addLazyLasagnaToShopping" type="button" style="margin-top:10px">Добавить недостающее в покупки</button>
+    </div>
   </section>
 </div>
 
@@ -357,6 +404,7 @@ const caesarIngredients=['Куриное филе','Кукуруза','Сала�
 const chineseChickenIngredients=['Куриная грудка','Кукурузный крахмал','Пищевая сода','Сычуаньский перец','Имбирь','Зелёный лук','Чеснок','Красный перец','Зелёный перец','Кунжут','Растительное масло','Светлый соевый соус','Устричный соус','Соль','Сахар','Куриный бульон / приправа','Чили-масло'];
 const funchozaIngredients=['Фунчоза / стеклянная лапша','Говядина','Соевый соус','Кунжутное масло','Крахмал','Красный лук','Сладкий перец','Огурец','Морковь','Сахар','Рисовый уксус','Паприка','Хлопья чили','Сушёный чеснок','Кунжут','Зелёный лук'];
 const donkatsuIngredients=['Куриное филе','Молоко','Мука','Яйцо','Соль','Чёрный перец','Паприка','Имбирный порошок','Чесночный порошок','Разрыхлитель','Растительное масло'];
+const lazyLasagnaIngredients=['Фарш','Репчатый лук','Чеснок','Оливковое масло','Томатная паста','Томатный соус для пасты','Говяжий или куриный бульон','Сливки','Листы для лазаньи','Пармезан','Моцарелла','Орегано','Базилик','Соль','Чёрный перец','Петрушка'];
 function addCaesarMissingToShopping(){
   const existing=new Set(Object.values(shopping).flat().map(x=>x.toLowerCase()));
   const added=[];
@@ -421,6 +469,26 @@ function addDonkatsuMissingToShopping(){
       x===low ||
       (item==='Растительное масло' && x.includes('масло подсолнечное')) ||
       (item==='Куриное филе' && (x.includes('куриное филе')||x.includes('куриная грудка')))
+    );
+    if(!covered){shopping['Продукты — обычные'].push(item);recipeAdded.push(item);existing.add(low);added.push(item)}
+  });
+  recipeAdded=[...new Set(recipeAdded)];localStorage.setItem(recipeAddedKey,JSON.stringify(recipeAdded));
+  renderShopping();renderToday();
+  const toast=document.getElementById('shopToast');
+  document.getElementById('shopToastText').textContent=added.length?`Добавлено в покупки: ${added.length}`:'Всё из рецепта уже есть в покупках';
+  document.getElementById('shopUndo').style.display='none';toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>{toast.classList.remove('show');document.getElementById('shopUndo').style.display=''},3500);
+}
+
+function addLazyLasagnaMissingToShopping(){
+  const existing=new Set(Object.values(shopping).flat().map(x=>x.toLowerCase()));
+  const added=[];
+  lazyLasagnaIngredients.forEach(item=>{
+    const low=item.toLowerCase();
+    const covered=[...existing].some(x=>
+      x===low ||
+      (item==='Оливковое масло' && (x.includes('оливковое масло')||x.includes('масло подсолнечное'))) ||
+      (item==='Говяжий или куриный бульон' && (x.includes('говяжий бульон')||x.includes('куриный бульон'))) ||
+      (item==='Сливки' && x.includes('сливки'))
     );
     if(!covered){shopping['Продукты — обычные'].push(item);recipeAdded.push(item);existing.add(low);added.push(item)}
   });
@@ -548,6 +616,7 @@ document.getElementById('addCaesarToShopping').addEventListener('click',addCaesa
 document.getElementById('addChineseChickenToShopping').addEventListener('click',addChineseChickenMissingToShopping);
 document.getElementById('addFunchozaToShopping').addEventListener('click',addFunchozaMissingToShopping);
 document.getElementById('addDonkatsuToShopping').addEventListener('click',addDonkatsuMissingToShopping);
+document.getElementById('addLazyLasagnaToShopping').addEventListener('click',addLazyLasagnaMissingToShopping);
 document.getElementById('shopSearch').addEventListener('input',renderShopping);
 document.querySelectorAll('[data-shopfilter]').forEach(b=>b.addEventListener('click',()=>{shopFilter=b.dataset.shopfilter;setFilterButton(shopFilter);renderShopping()}));
 document.getElementById('shopUndo').addEventListener('click',()=>{if(!lastShopAction)return;const a=lastShopAction;setShopState(a.group,a.item,!a.checked,false);document.getElementById('shopToast').classList.remove('show');lastShopAction=null;});
