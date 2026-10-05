@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Мой хаб</title>
+<style>
+:root{
+  --bg:#0D0F14;
+  --card:#1B1E27;
+  --card2:#252935;
+  --text:#FFFFFF;
+  --muted:#C9C3CC;
+  --accent:#F2A6C4;
+  --accent2:#D9A7B9;
+  --line:#414652;
+  --good:#89C9A7;
+  --warn:#D9B77A;
+  --danger:#E28D8D;
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+button,input{font:inherit}
+a{color:inherit}
+.app{max-width:760px;margin:0 auto;padding:18px 14px calc(100px + env(safe-area-inset-bottom))}
+.top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin:8px 2px 18px}
+.eyebrow{font-size:13px;color:var(--muted);margin-bottom:5px}
+h1{font-size:30px;line-height:1.05;margin:0;letter-spacing:-.02em}
+.date{font-size:13px;color:var(--muted);text-align:right;white-space:nowrap}
+.hero{background:linear-gradient(135deg,#20232d,#302633);border:1px solid #4c5260;border-radius:24px;padding:18px;margin-bottom:14px}
+.hero-title{font-size:18px;font-weight:700;margin-bottom:6px}
+.hero-sub{color:var(--muted);font-size:14px;line-height:1.45}
+.quick{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+.q{background:#2B303D;border:1px solid #505765;box-shadow:0 4px 14px rgba(0,0,0,.18);border-radius:18px;padding:14px;text-align:left;color:var(--text)}
+.q strong{display:block;font-size:15px;margin-bottom:4px}.q span{font-size:12px;color:var(--muted)}
+.section{display:none}.section.active{display:block}
+.card{background:var(--card);border:1px solid #444A57;box-shadow:0 5px 16px rgba(0,0,0,.14);border-radius:22px;padding:16px;margin:12px 0}
+.card h2,.card h3{margin:0 0 10px}.card h2{font-size:20px}.card h3{font-size:16px}
+.subtle{color:var(--muted);font-size:13px;line-height:1.45}
+.group{margin:18px 0 8px}
+.group-title{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:#E8E2EA;margin:0 4px 8px}
+.item{display:flex;align-items:flex-start;gap:11px;padding:12px 4px;border-bottom:1px solid rgba(255,255,255,.11)}
+.item:last-child{border-bottom:none}
+.item input[type=checkbox]{appearance:none;width:21px;height:21px;border-radius:7px;border:1.5px solid #68616b;background:#111319;flex:0 0 auto;margin-top:1px;display:grid;place-items:center}
+.item input[type=checkbox]:checked{background:var(--accent);border-color:var(--accent)}
+.item input[type=checkbox]:checked:after{content:'✓';color:#1a1116;font-weight:900;font-size:14px}
+.item label{line-height:1.35;font-size:15px;flex:1}
+.item.done label{text-decoration:line-through;color:#706b73}
+.badge{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:700;margin-left:6px;vertical-align:1px}
+.badge.now{background:rgba(228,145,177,.16);color:#f2abc5}.badge.soon{background:rgba(217,183,122,.15);color:#e5c990}.badge.later{background:rgba(169,164,172,.13);color:#bbb5bf}
+.toolbar{display:flex;gap:8px;overflow:auto;padding-bottom:4px}.chip{border:1px solid #505765;background:#2A2E3A;color:#E4DEE6;border-radius:999px;padding:9px 12px;white-space:nowrap}.chip.active{background:var(--accent);color:#21151b;border-color:var(--accent);font-weight:800}
+.day{border:1px solid #4A505E;background:#252A36;border-radius:18px;padding:14px;margin:10px 0}.day.today{outline:2px solid var(--accent);outline-offset:1px}.day-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:8px}.day-name{font-weight:800}.day-meta{font-size:12px;color:var(--muted)}
+.steps{display:grid;gap:7px;margin-top:8px}.step{background:#171A22;border:1px solid #3E4451;border-radius:14px;padding:10px 12px;font-size:14px;line-height:1.4}.step b{color:#f4b2ca}
+.video{display:block;text-decoration:none;background:#171A22;border:1px solid #434956;border-radius:15px;padding:12px;margin-top:9px}.video-title{font-size:14px;font-weight:700;line-height:1.35}.video-meta{font-size:12px;color:var(--muted);margin-top:4px}.video-link{font-size:12px;color:var(--accent);margin-top:7px}
+.note{border-left:3px solid var(--accent2);padding:9px 11px;background:#15161c;border-radius:0 12px 12px 0;color:#d4ced5;font-size:13px;line-height:1.45;margin-top:10px}
+.bottom{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;width:min(730px,calc(100% - 20px));background:rgba(29,33,43,.96);backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:22px;padding:8px;display:grid;grid-template-columns:repeat(4,1fr);gap:5px;z-index:10;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.nav{border:0;background:transparent;color:#8f8992;border-radius:16px;padding:10px 4px;font-size:12px}.nav .ico{display:block;font-size:20px;margin-bottom:3px}.nav.active{background:#4A3440;color:#fff;box-shadow:inset 0 0 0 1px #805a6c}.nav.active .ico{filter:none}
+.collapse-btn{flex:1;display:flex;justify-content:space-between;align-items:center;border:0;background:transparent;color:var(--text);padding:0;text-align:left}.group-head{display:flex;align-items:center;gap:10px}.delete-mode-btn{border:1px solid #6a4a56;background:transparent;color:#f2abc5;border-radius:10px;padding:6px 9px;font-size:12px;white-space:nowrap}.delete-item-btn{width:24px;height:24px;border-radius:8px;border:1px solid #8b4f5f;background:#3a2028;color:#ffb3c7;font-weight:900;flex:0 0 auto}.collapse-content{margin-top:8px}.hidden{display:none!important}
+.empty{padding:30px 12px;text-align:center;color:var(--muted)}
+.search{width:100%;border:1px solid #505765;background:#171A22;color:var(--text);border-radius:15px;padding:12px 14px;outline:none}.search:focus{border-color:var(--accent2)}
+.small{font-size:12px;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:92px;transform:translate(-50%,14px);opacity:0;pointer-events:none;z-index:30;background:#2b303d;border:1px solid #606877;color:#fff;border-radius:16px;padding:11px 12px;box-shadow:0 10px 30px rgba(0,0,0,.35);display:flex;align-items:center;gap:12px;max-width:calc(100% - 28px);transition:.2s ease}.toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}.toast button{border:0;background:var(--accent);color:#21151b;border-radius:10px;padding:7px 10px;font-weight:800}
+@media (min-width:700px){.quick{grid-template-columns:repeat(4,1fr)}.app{padding-top:28px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div><div class="eyebrow">личный хаб</div><h1>Мой хаб</h1></div>
+    <div class="date" id="todayDate"></div>
+  </div>
+
+  <section id="home" class="section active">
+    <div class="hero">
+      <div class="hero-title">Всё важное в одном месте</div>
+      <div class="hero-sub">Покупки, уход, тренировки и любимые рецепты. Всё нужное собрано в одном месте.</div>
+      <div class="quick">
+        <button class="q" data-go="shopping"><strong>Покупки</strong><span>ближайшие и плановые покупки</span></button>
+        <button class="q" data-go="care"><strong>Уход</strong><span>расписание по дням</span></button>
+        <button class="q" data-go="workouts"><strong>Тренировки</strong><span>видео на каждый день</span></button>
+        <button class="q" data-go="recipes"><strong>Рецепты</strong><span>наши проверенные блюда</span></button>
+      </div>
+    </div>
+    <div class="card" id="todayCard"></div>
+  </section>
+
+  <section id="shopping" class="section">
+    <div class="card">
+      <h2>Покупки</h2>
+      <div class="subtle">Чекбоксы сохраняются на этом устройстве. Купленное можно скрыть фильтром.</div>
+      <input id="shopSearch" class="search" placeholder="Поиск по покупкам…" style="margin-top:12px" />
+      <div class="toolbar" style="margin-top:10px">
+        <button class="chip active" data-shopfilter="open">Нужно купить</button>
+        <button class="chip" data-shopfilter="all">Все</button>
+        <button class="chip" data-shopfilter="done">Куплено</button>
+      </div>
+      <div class="steps" style="margin-top:12px">
+        <div class="step"><b>Ближайшее:</b> <span id="activeShopCount">0</span> вещей</div>
+        <div class="step"><b>Продукты:</b> обычные отдельно, рамен — в сворачиваемом списке</div>
+      </div>
+    </div>
+    <div id="shoppingGroups"></div>
+  </section>
+
+  <section id="care" class="section">
+    <div class="card"><h2>Уход</h2><div class="subtle">Фиксированная схема: активы в будни, выходные — только база.</div></div>
+    <div class="card">
+      <h3>Я</h3>
+      <div id="careMe"></div>
+    </div>
+    <div class="card">
+      <h3>Никита</h3>
+      <div id="careNikita"></div>
+      <div class="note"><b>Прыщ по стадиям:</b> красный болезненный → Akneroxid; белая головка → hydrocolloid patch; влажная ранка → гидроколлоидная защита; плоский след → азелаиновая кислота + SPF.</div>
+    </div>
+  </section>
+
+  <section id="workouts" class="section">
+    <div class="card"><h2>Тренировки</h2><div class="subtle">2 дня ног/ягодиц, 2 deep core, 1 mobility/stability, 1 спина/осанка, 1 отдых.</div><div class="note">Левое бедро: не форсировать большие круги прямой ногой, глубокий pigeon и движения, где приходится заваливать таз. Щелчок + зажим/прострел/онемение = движение пропустить.</div></div>
+    <div id="workoutDays"></div>
+  </section>
+
+  <section id="recipes" class="section">
+    <div class="card">
+      <h2>Рецепты</h2>
+      <div class="subtle">Наши удачные рецепты, которые хочется повторять.</div>
+    </div>
+    <div class="card">
+      <h3>Наш Цезарь</h3>
+      <div class="subtle">Домашний вариант с курицей, кукурузой, айсбергом, черри и чесночными гренками.</div>
+      <div class="group"><div class="group-title">Ингредиенты</div>
+        <div class="steps">
+          <div class="step">Куриное филе</div><div class="step">Кукуруза</div><div class="step">Салат айсберг</div><div class="step">Помидоры черри</div><div class="step">Хлеб для гренок</div><div class="step">Чеснок</div>
+        </div>
+      </div>
+      <div class="group"><div class="group-title">Соус</div>
+        <div class="steps">
+          <div class="step">Соевый соус</div><div class="step">Масло</div><div class="step">Майонез или греческий йогурт</div><div class="step">Горчица</div><div class="step">Мёд</div><div class="step">Лимонный сок</div>
+        </div>
+      </div>
+      <div class="group"><div class="group-title">Как готовить</div>
+        <div class="steps">
+          <div class="step"><b>1.</b> Нарезать хлеб и обжарить гренки на сковороде с чесноком.</div>
+          <div class="step"><b>2.</b> В том же ароматном масле обжарить куриное филе, нарезанное небольшими кусочками.</div>
+          <div class="step"><b>3.</b> Нарезать айсберг и черри, добавить кукурузу, курицу и гренки.</div>
+          <div class="step"><b>4.</b> Отдельно пробить блендером все ингредиенты соуса до однородности.</div>
+          <div class="step"><b>5.</b> Полить салат соусом и перемешать перед подачей.</div>
+        </div>
+      </div>
+      <button class="chip" id="addCaesarToShopping" type="button">Добавить недостающее в покупки</button>
+    </div>
+  </section>
+</div>
+
+<div id="shopToast" class="toast"><span id="shopToastText">Перенесено в купленное</span><button id="shopUndo">Отменить</button></div>
+
+<nav class="bottom">
+  <button class="nav active" data-section="home"><span class="ico">⌂</span>Главная</button>
+  <button class="nav" data-section="shopping"><span class="ico">🛒</span>Покупки</button>
+  <button class="nav" data-section="care"><span class="ico">◌</span>Уход</button>
+  <button class="nav" data-section="workouts"><span class="ico">↗</span>Тренировки</button>
+</nav>
+
+<script>
+const DOW=['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
+const dowShort=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+const now=new Date();
+document.getElementById('todayDate').innerHTML=`${DOW[now.getDay()]}<br>${now.toLocaleDateString('ru-RU',{day:'2-digit',month:'long'})}`;
+
+const shopping={
+ 'Купить в ближайшее время':[
+  'Air Wick в туалет','Тёрка для корейской морковки','Стакан для щёток','Пилочка для ногтей','Керлер / завиватель для ресниц','Чёрный свитер, такой же как белый махровый','Красивое платье на осень/зиму'],
+ 'Плановые покупки по надобности':[
+  'Подставка для обуви','Насадка на швабру; если не найдём — купить новую швабру','Карандаш для глаз','Блок зарядки USB-C','Нормальный фен с диффузором','Машинка для бритья','Маленький павербанк','Superlux HD-681 Evo наушники','Тушь с изогнутой анатомичной щёточкой','Прозрачная розовая база','Тёплая большая зимняя домашняя кофта как в KiK','Тёплые угги-тапки','УФ-лампочка для ногтей','Huawei часы','Шнур micro-USB для раскладушки','Цифровой фотоаппарат / 4K-камера','The Ordinary Caffeine Solution 5% + EGCG','La Roche-Posay Cicaplast Baume B5+'],
+ 'Куплено / уже есть':[
+  'Мусорка в туалет','Плоские тарелки','Тряпка для посуды и пола','Тканевый коврик для сушки кастрюль','Ушные палочки','Полотенце среднего размера для волос','VT Cosmetics Spot Patch, 48 шт. — Rossmann','BHA 2% — куплено в Rossmann','Плампер','Salt spray','Лифчик','Akneroxid 5% gel — уже есть дома','Мицеллярка — уже есть Bioderma'],
+ 'Продукты — обычные':[
+  'Масло сливочное','Крахмал','Сыр','Майонез','Морковка','Лук','Actimel или йогурты','Масло подсолнечное','Сливки','Пиво','Замороженные овощи','Lékařský líh / Alcohol disinfector / Sprit','Бананы','Фунчоза','Красный лук','Красный перец','Огурец'],
+ 'Продукты — рамен':[
+  'Куриный бульон / концентрат','Грибной бульон / концентрат','Шрирача','Свиные стейки','Лук-порей','Пекинская капуста','Грибы шиитаке','Нори','Кунжут','Зелёный лук','Чеснок','Кунжутное масло','Устричный соус','Мисо паста']
+};
+const recipeAddedKey='myhub-recipe-added-v1';
+let recipeAdded=[];try{recipeAdded=JSON.parse(localStorage.getItem(recipeAddedKey)||'[]')}catch(e){}
+recipeAdded.forEach(item=>{if(!shopping['Продукты — обычные'].includes(item)) shopping['Продукты — обычные'].push(item)});
+const caesarIngredients=['Куриное филе','Кукуруза','Салат айсберг','Помидоры черри','Хлеб для гренок','Чеснок','Соевый соус','Масло','Майонез или греческий йогурт','Горчица','Мёд','Лимонный сок'];
+function addCaesarMissingToShopping(){
+  const existing=new Set(Object.values(shopping).flat().map(x=>x.toLowerCase()));
+  const added=[];
+  caesarIngredients.forEach(item=>{
+    const low=item.toLowerCase();
+    const covered=[...existing].some(x=>x===low || (item==='Масло' && (x.includes('масло подсолнечное')||x.includes('масло сливочное'))) || (item==='Майонез или греческий йогурт' && (x==='майонез'||x.includes('греческий йогурт'))));
+    if(!covered){shopping['Продукты — обычные'].push(item);recipeAdded.push(item);existing.add(low);added.push(item)}
+  });
+  recipeAdded=[...new Set(recipeAdded)];localStorage.setItem(recipeAddedKey,JSON.stringify(recipeAdded));
+  renderShopping();renderToday();
+  const toast=document.getElementById('shopToast');
+  document.getElementById('shopToastText').textContent=added.length?`Добавлено в покупки: ${added.length}`:'Всё из рецепта уже есть в покупках';
+  document.getElementById('shopUndo').style.display='none';toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>{toast.classList.remove('show');document.getElementById('shopUndo').style.display=''},3500);
+}
+const presetDone=new Set(shopping['Куплено / уже есть']);
+const key='myhub-shopping-v1';
+let saved={};try{saved=JSON.parse(localStorage.getItem(key)||'{}')}catch(e){}
+function itemId(group,item){return btoa(unescape(encodeURIComponent(group+'|'+item))).replace(/=/g,'')}
+let shopFilter='open';
+const deleteModeGroups=new Set();
+let lastShopAction=null;
+let toastTimer=null;
+function setFilterButton(filter){
+  document.querySelectorAll('[data-shopfilter]').forEach(x=>x.classList.toggle('active',x.dataset.shopfilter===filter));
+}
+function showShopToast(group,item,checked){
+  const toast=document.getElementById('shopToast');
+  document.getElementById('shopToastText').textContent=checked?'Готово — перенесено в «Куплено»':'Вернул в список покупок';
+  lastShopAction={group,item,checked};
+  toast.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),3500);
+}
+function setShopState(group,item,checked,withToast=true){
+  const id=itemId(group,item);saved[id]=checked;localStorage.setItem(key,JSON.stringify(saved));
+  if(withToast) showShopToast(group,item,checked);
+  renderShopping();renderToday();
+}
+function allShoppingRows(){
+  const rows=[];
+  Object.entries(shopping).forEach(([group,items])=>items.forEach(item=>{
+    const id=itemId(group,item);const checked=saved[id] ?? presetDone.has(item);
+    rows.push({group,item,id,checked});
+  }));
+  return rows;
+}
+function renderDoneOnly(root,term){
+  const done=allShoppingRows().filter(x=>x.checked && (!term || x.item.toLowerCase().includes(term)));
+  const wrap=document.createElement('div');wrap.className='card';
+  wrap.innerHTML=`<h3>Куплено / выполнено <span class="badge later">${done.length}</span></h3><div class="collapse-content"></div>`;
+  const content=wrap.querySelector('.collapse-content');
+  done.forEach(x=>{
+    const row=document.createElement('div');row.className='item done';
+    row.innerHTML=`<input type="checkbox" id="done-${x.id}" checked><label for="done-${x.id}">${x.item}<div class="small" style="margin-top:3px">${x.group}</div></label>`;
+    row.querySelector('input').addEventListener('change',e=>setShopState(x.group,x.item,e.target.checked));
+    content.appendChild(row);
+  });
+  if(!done.length) content.innerHTML='<div class="small" style="padding:8px 2px">Пока ничего не отмечено</div>';
+  root.appendChild(wrap);
+}
+function renderShopping(){
+  const root=document.getElementById('shoppingGroups');root.innerHTML='';
+  const term=(document.getElementById('shopSearch').value||'').trim().toLowerCase();
+  if(shopFilter==='done'){
+    renderDoneOnly(root,term);
+  }else{
+    Object.entries(shopping).forEach(([group,items])=>{
+      if(group==='Куплено / уже есть' && shopFilter==='open') return;
+      const wrap=document.createElement('div');wrap.className='card';
+      const badge=group==='Купить в ближайшее время'?'<span class="badge now">сейчас</span>':group==='Плановые покупки по надобности'?'<span class="badge later">планово</span>':'';
+      wrap.innerHTML=`<div class="group-head"><button class="collapse-btn"><h3>${group}${badge}</h3><span>⌄</span></button><button class="delete-mode-btn" type="button">${deleteModeGroups.has(group)?'Готово':'Удалить'}</button></div><div class="collapse-content"></div>`;
+      const content=wrap.querySelector('.collapse-content');
+      wrap.querySelector('.delete-mode-btn').addEventListener('click',e=>{e.stopPropagation();if(deleteModeGroups.has(group))deleteModeGroups.delete(group);else deleteModeGroups.add(group);renderShopping()});
+      let visible=0;
+      items.forEach(item=>{
+        const id=itemId(group,item); const checked=saved[id] ?? presetDone.has(item);
+        if(term && !item.toLowerCase().includes(term)) return;
+        if(shopFilter==='open' && checked) return;
+        visible++;
+        const row=document.createElement('div');row.className='item'+(checked?' done':'');
+        if(deleteModeGroups.has(group)){
+          row.innerHTML=`<button class="delete-item-btn" type="button" aria-label="Удалить">−</button><label>${item}</label>`;
+          row.querySelector('.delete-item-btn').addEventListener('click',()=>{shopping[group]=shopping[group].filter(x=>x!==item);delete saved[id];localStorage.setItem(key,JSON.stringify(saved));recipeAdded=recipeAdded.filter(x=>x!==item);localStorage.setItem(recipeAddedKey,JSON.stringify(recipeAdded));renderShopping();renderToday()});
+        }else{
+          row.innerHTML=`<input type="checkbox" id="${id}" ${checked?'checked':''}><label for="${id}">${item}</label>`;
+          row.querySelector('input').addEventListener('change',e=>setShopState(group,item,e.target.checked));
+        }
+        content.appendChild(row);
+      });
+      if(!visible) return;
+      if(group==='Плановые покупки по надобности' || group==='Куплено / уже есть' || group==='Продукты — рамен') content.classList.add('hidden');
+      wrap.querySelector('.collapse-btn').addEventListener('click',()=>content.classList.toggle('hidden'));
+      root.appendChild(wrap);
+    });
+  }
+  let activeCount=0;
+  shopping['Купить в ближайшее время'].forEach(item=>{
+    const id=itemId('Купить в ближайшее время',item); const checked=saved[id] ?? false; if(!checked) activeCount++;
+  });
+  const counter=document.getElementById('activeShopCount'); if(counter) counter.textContent=activeCount;
+}
+document.getElementById('addCaesarToShopping').addEventListener('click',addCaesarMissingToShopping);
+document.getElementById('shopSearch').addEventListener('input',renderShopping);
+document.querySelectorAll('[data-shopfilter]').forEach(b=>b.addEventListener('click',()=>{shopFilter=b.dataset.shopfilter;setFilterButton(shopFilter);renderShopping()}));
+document.getElementById('shopUndo').addEventListener('click',()=>{if(!lastShopAction)return;const a=lastShopAction;setShopState(a.group,a.item,!a.checked,false);document.getElementById('shopToast').classList.remove('show');lastShopAction=null;});
+
+const careMe={
+1:['Утро: вода → ниацинамидовый крем → при сухости The Ordinary NMF + HA → SPF → макияж','Вечер: мягкое очищение → Revox Azelaic Acid 10% → The Ordinary NMF + HA'],
+2:['Утро: вода → ниацинамидовый крем → при сухости The Ordinary NMF + HA → SPF → макияж','Вечер: мягкое очищение → BHA 2% на нос и лоб → увлажняющий крем'],
+3:['Утро: вода → ниацинамидовый крем → при сухости The Ordinary NMF + HA → SPF → макияж','Вечер: мягкое очищение → Revox Azelaic Acid 10% → крем'],
+4:['Утро: вода → ниацинамидовый крем → при сухости The Ordinary NMF + HA → SPF → макияж','Вечер: мягкое очищение → только увлажняющий крем'],
+5:['Утро: вода → ниацинамидовый крем → при сухости The Ordinary NMF + HA → SPF → макияж','Вечер: мягкое очищение → Revox Azelaic Acid 10% → крем'],
+6:['Утро: вода → SPF; при сухости обычный крем','Вечер: мягкое очищение → увлажняющий крем'],
+0:['Утро: вода → SPF; при сухости обычный крем','Вечер: мягкое очищение → увлажняющий крем']};
+const careNikita={
+1:['Утро: вода → The Ordinary NMF + HA → SPF','Вечер: умывание → азелаиновая кислота тонким слоем на всё лицо → крем'],
+2:['Утро: вода → The Ordinary NMF + HA → SPF','Вечер: умывание → только крем; при активном красном прыще — Akneroxid точечно'],
+3:['Утро: вода → The Ordinary NMF + HA → SPF','Вечер: умывание → азелаиновая кислота тонким слоем на всё лицо → крем'],
+4:['Утро: вода → The Ordinary NMF + HA → SPF','Вечер: умывание → только крем; при активном красном прыще — Akneroxid точечно'],
+5:['Утро: вода → The Ordinary NMF + HA → SPF','Вечер: умывание → азелаиновая кислота тонким слоем на всё лицо → крем'],
+6:['Утро: вода → SPF','Вечер: умывание → крем; Akneroxid только если реально есть активный воспалённый прыщ'],
+0:['Утро: вода → SPF','Вечер: умывание → крем; Akneroxid только если реально есть активный воспалённый прыщ']};
+function renderCareBlock(rootId,data){
+ const root=document.getElementById(rootId);root.innerHTML='';
+ [1,2,3,4,5,6,0].forEach(d=>{const el=document.createElement('div');el.className='day'+(now.getDay()===d?' today':'');el.innerHTML=`<div class="day-head"><div class="day-name">${DOW[d]}${now.getDay()===d?' <span class="badge now">сегодня</span>':''}</div></div><div class="steps">${data[d].map((x,i)=>`<div class="step"><b>${i===0?'Утро':'Вечер'}:</b> ${x.replace(/^Утро:\s*|^Вечер:\s*/,'')}</div>`).join('')}</div>`;root.appendChild(el)});
+}
+
+const workouts={
+1:{title:'Ноги / ягодицы',video:'15 Min. Pilates Booty Workout | Toned & Round Butt without…',author:'Mady Morrison',dur:'~15 мин',url:'',note:'Минимум: 5–7 минут. Пропускать движения, где левое бедро щёлкает с зажимом или приходится уводить таз.'},
+2:{title:'Deep core',video:'15 MIN DEEP CORE PILATES | NO CRUNCHES (Neck Friendly)',author:'LivAligned Pilates',dur:'16:30',url:'https://www.youtube.com/watch?v=ZZ6Al9ImpMM',note:'Финальный knee hover / plank после ~12-й минуты можно пропустить или облегчить.'},
+3:{title:'Mobility + stability',video:'3 SAFE Moves for Sciatica Pain Relief in 2 Minutes',author:'Precision Movement',dur:'1:19',url:'https://www.youtube.com/watch?v=f_G7dd3uCwc',note:'После — 5–10 минут мягкой mobility: pelvic tilts, cat-cow, bent-knee hip rotations, glute bridge или bird-dog.'},
+4:{title:'Верхняя спина / плечи / осанка',video:'10 Minute Upper Back Stretches - Upper Back Workout at Home!',author:'Jessica Valant Pilates',dur:'10:31',url:'https://www.youtube.com/watch?v=jEk1wOxZiS8',note:'Фокус: лопатки, верхняя спина, плечи, грудной отдел.'},
+5:{title:'Ноги / ягодицы',video:'15 Min. Pilates Booty Workout | Toned & Round Butt without…',author:'Mady Morrison',dur:'~15 мин',url:'',note:'Повторить знакомое видео или сделать 10–12 минут: calf raises, standing glute squeezes, small straight-back leg pulses, very small-range good mornings только если комфортно.'},
+6:{title:'Deep core + лёгкая растяжка',video:'Start Here BEFORE you go to Pilates! 15 Min Deep Core Workout at Home',author:'PilatesBodyRaven',dur:'~16 мин активной части',url:'https://www.youtube.com/watch?v=_SYWwxqqcDo',note:'Пропустить Chest Lift / Scissors примерно 09:13–13:00. После — лёгкая растяжка без глубокого pigeon/шпагата.'},
+0:{title:'Отдых',video:'',author:'',dur:'',url:'',note:'Ничего обязательного. Можно прогулку или 5–10 минут мягкой mobility.'}}
+function renderWorkouts(){const root=document.getElementById('workoutDays');root.innerHTML='';[1,2,3,4,5,6,0].forEach(d=>{const w=workouts[d];const el=document.createElement('div');el.className='day'+(now.getDay()===d?' today':'');el.innerHTML=`<div class="day-head"><div><div class="day-name">${DOW[d]}${now.getDay()===d?' <span class="badge now">сегодня</span>':''}</div><div class="day-meta">${w.title}</div></div><div class="day-meta">${w.dur||''}</div></div>${w.video?`<a class="video" ${w.url?`href="${w.url}" target="_blank"`:''}><div class="video-title">${w.video}</div><div class="video-meta">${w.author}</div>${w.url?'<div class="video-link">Открыть видео ↗</div>':''}</a>`:''}<div class="note">${w.note}</div>`;root.appendChild(el)})}
+
+function renderToday(){
+ const d=now.getDay(); const w=workouts[d];
+ let nearest=[]; shopping['Купить в ближайшее время'].forEach(item=>{const id=itemId('Купить в ближайшее время',item);const checked=saved[id]??false;if(!checked)nearest.push(item)});
+ const c=careMe[d];
+ const preview=nearest.slice(0,4).map(x=>`• ${x}`).join('<br>');
+ const more=nearest.length>4?`<div class="small" style="margin-top:6px">+ ещё ${nearest.length-4}</div>`:'';
+ document.getElementById('todayCard').innerHTML=`<h2>Сегодня</h2><div class="steps"><div class="step"><b>Уход вечером:</b> ${c[1].replace(/^Вечер:\s*/,'')}</div><div class="step"><b>Тренировка:</b> ${w.title}${w.video?' — '+w.video:''}</div><div class="step"><b>Ближайшие покупки:</b><div style="margin-top:6px;line-height:1.5">${preview||'Ничего срочного'}</div>${more}</div></div>`;
+}
+
+function showSection(id){document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===id));document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.section===id));window.scrollTo({top:0,behavior:'smooth'})}
+document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>showSection(b.dataset.section)));
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>showSection(b.dataset.go)));
+
+renderShopping();renderCareBlock('careMe',careMe);renderCareBlock('careNikita',careNikita);renderWorkouts();renderToday();
+</script>
+</body>
+</html>
+
