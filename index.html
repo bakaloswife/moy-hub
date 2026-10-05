@@ -151,6 +151,64 @@ h1{font-size:30px;line-height:1.05;margin:0;letter-spacing:-.02em}
       </div>
       <button class="chip" id="addCaesarToShopping" type="button">Добавить недостающее в покупки</button>
     </div>
+
+    <div class="card">
+      <h3>Курица по-китайски</h3>
+      <div class="subtle">Тонкие кусочки куриной грудки, быстро отваренные с имбирём и зелёным луком и смешанные с горячим пикантным соусом.</div>
+
+      <div class="group"><div class="group-title">Для курицы</div>
+        <div class="steps">
+          <div class="step">Куриная грудка — 2 шт.</div>
+          <div class="step">Кукурузный крахмал</div>
+          <div class="step">Пищевая сода</div>
+        </div>
+      </div>
+
+      <div class="group"><div class="group-title">Для варки</div>
+        <div class="steps">
+          <div class="step">Вода</div>
+          <div class="step">Сычуаньский перец — 2–3 горошины</div>
+          <div class="step">Имбирь</div>
+          <div class="step">Зелёный лук</div>
+        </div>
+      </div>
+
+      <div class="group"><div class="group-title">Для соуса</div>
+        <div class="steps">
+          <div class="step">Чеснок</div>
+          <div class="step">Белая часть зелёного лука</div>
+          <div class="step">Красный и зелёный перец</div>
+          <div class="step">Кунжут — 1 ч. л.</div>
+          <div class="step">Растительное масло</div>
+          <div class="step">Светлый соевый соус</div>
+          <div class="step">Устричный соус</div>
+          <div class="step">Соль</div>
+          <div class="step">Сахар</div>
+          <div class="step">Куриный бульон / приправа</div>
+          <div class="step">Чили-масло — по желанию</div>
+        </div>
+      </div>
+
+      <div class="group"><div class="group-title">Как готовить</div>
+        <div class="steps">
+          <div class="step"><b>1.</b> Нарезать куриную грудку тонкими пластинками.</div>
+          <div class="step"><b>2.</b> Смешать кукурузный крахмал с небольшим количеством пищевой соды, обвалять в смеси курицу.</div>
+          <div class="step"><b>3.</b> Накрыть пищевой плёнкой и слегка отбить скалкой, чтобы кусочки стали тонкими.</div>
+          <div class="step"><b>4.</b> Для соуса смешать рубленый чеснок, белую часть зелёного лука, мелко нарезанные красный и зелёный перцы и кунжут.</div>
+          <div class="step"><b>5.</b> Залить всё раскалённым растительным маслом.</div>
+          <div class="step"><b>6.</b> Добавить светлый соевый и устричный соусы, соль, сахар, куриный бульон и по желанию чили-масло. Перемешать.</div>
+          <div class="step"><b>7.</b> В кипящую воду добавить сычуаньский перец, имбирь и зелёный лук.</div>
+          <div class="step"><b>8.</b> Опускать курицу по одному кусочку и варить примерно 1 минуту, пока мясо полностью не побелеет.</div>
+          <div class="step"><b>9.</b> Переложить готовую курицу в миску с соусом и хорошо перемешать.</div>
+        </div>
+      </div>
+
+      <a class="video" href="https://youtu.be/1c5gBx47KCw?si=5kLy798BUfkPw22p" target="_blank" rel="noopener noreferrer">
+        <div class="video-title">Видео-рецепт</div>
+        <div class="video-link">Открыть на YouTube ↗</div>
+      </a>
+      <button class="chip" id="addChineseChickenToShopping" type="button" style="margin-top:10px">Добавить недостающее в покупки</button>
+    </div>
   </section>
 </div>
 
@@ -186,12 +244,34 @@ const recipeAddedKey='myhub-recipe-added-v1';
 let recipeAdded=[];try{recipeAdded=JSON.parse(localStorage.getItem(recipeAddedKey)||'[]')}catch(e){}
 recipeAdded.forEach(item=>{if(!shopping['Продукты — обычные'].includes(item)) shopping['Продукты — обычные'].push(item)});
 const caesarIngredients=['Куриное филе','Кукуруза','Салат айсберг','Помидоры черри','Хлеб для гренок','Чеснок','Соевый соус','Масло','Майонез или греческий йогурт','Горчица','Мёд','Лимонный сок'];
+const chineseChickenIngredients=['Куриная грудка','Кукурузный крахмал','Пищевая сода','Сычуаньский перец','Имбирь','Зелёный лук','Чеснок','Красный перец','Зелёный перец','Кунжут','Растительное масло','Светлый соевый соус','Устричный соус','Соль','Сахар','Куриный бульон / приправа','Чили-масло'];
 function addCaesarMissingToShopping(){
   const existing=new Set(Object.values(shopping).flat().map(x=>x.toLowerCase()));
   const added=[];
   caesarIngredients.forEach(item=>{
     const low=item.toLowerCase();
     const covered=[...existing].some(x=>x===low || (item==='Масло' && (x.includes('масло подсолнечное')||x.includes('масло сливочное'))) || (item==='Майонез или греческий йогурт' && (x==='майонез'||x.includes('греческий йогурт'))));
+    if(!covered){shopping['Продукты — обычные'].push(item);recipeAdded.push(item);existing.add(low);added.push(item)}
+  });
+  recipeAdded=[...new Set(recipeAdded)];localStorage.setItem(recipeAddedKey,JSON.stringify(recipeAdded));
+  renderShopping();renderToday();
+  const toast=document.getElementById('shopToast');
+  document.getElementById('shopToastText').textContent=added.length?`Добавлено в покупки: ${added.length}`:'Всё из рецепта уже есть в покупках';
+  document.getElementById('shopUndo').style.display='none';toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>{toast.classList.remove('show');document.getElementById('shopUndo').style.display=''},3500);
+}
+function addChineseChickenMissingToShopping(){
+  const existing=new Set(Object.values(shopping).flat().map(x=>x.toLowerCase()));
+  const added=[];
+  chineseChickenIngredients.forEach(item=>{
+    const low=item.toLowerCase();
+    const covered=[...existing].some(x=>
+      x===low ||
+      (item==='Куриная грудка' && (x.includes('куриное филе')||x.includes('куриная грудка'))) ||
+      (item==='Кукурузный крахмал' && x.includes('крахмал')) ||
+      (item==='Растительное масло' && x.includes('масло подсолнечное')) ||
+      (item==='Светлый соевый соус' && x.includes('соевый соус')) ||
+      (item==='Куриный бульон / приправа' && x.includes('куриный бульон'))
+    );
     if(!covered){shopping['Продукты — обычные'].push(item);recipeAdded.push(item);existing.add(low);added.push(item)}
   });
   recipeAdded=[...new Set(recipeAdded)];localStorage.setItem(recipeAddedKey,JSON.stringify(recipeAdded));
@@ -314,6 +394,7 @@ document.getElementById('addItemForm').addEventListener('submit',e=>{
   closeAddItemSheet();renderShopping();renderToday();
 });
 document.getElementById('addCaesarToShopping').addEventListener('click',addCaesarMissingToShopping);
+document.getElementById('addChineseChickenToShopping').addEventListener('click',addChineseChickenMissingToShopping);
 document.getElementById('shopSearch').addEventListener('input',renderShopping);
 document.querySelectorAll('[data-shopfilter]').forEach(b=>b.addEventListener('click',()=>{shopFilter=b.dataset.shopfilter;setFilterButton(shopFilter);renderShopping()}));
 document.getElementById('shopUndo').addEventListener('click',()=>{if(!lastShopAction)return;const a=lastShopAction;setShopState(a.group,a.item,!a.checked,false);document.getElementById('shopToast').classList.remove('show');lastShopAction=null;});
