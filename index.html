@@ -268,6 +268,57 @@ h1{font-size:30px;line-height:1.05;margin:0;letter-spacing:-.02em}
       </a>
       <button class="chip" id="addFunchozaToShopping" type="button" style="margin-top:10px">Добавить недостающее в покупки</button>
     </div>
+
+    <div class="card">
+      <h3>Хрустящее куриное донкацу</h3>
+      <div class="subtle">Куриное филе в пряном молочно-яичном маринаде и очень хрустящей крошке.</div>
+
+      <div class="group"><div class="group-title">Для курицы и маринада</div>
+        <div class="steps">
+          <div class="step">Куриное филе</div>
+          <div class="step">Молоко</div>
+          <div class="step">Мука</div>
+          <div class="step">Яйцо</div>
+          <div class="step">Соль</div>
+          <div class="step">Чёрный перец</div>
+          <div class="step">Паприка</div>
+          <div class="step">Имбирный порошок</div>
+          <div class="step">Чесночный порошок</div>
+        </div>
+      </div>
+
+      <div class="group"><div class="group-title">Для хрустящей панировки</div>
+        <div class="steps">
+          <div class="step">Мука</div>
+          <div class="step">Разрыхлитель</div>
+          <div class="step">Вода</div>
+        </div>
+      </div>
+
+      <div class="group"><div class="group-title">Для жарки</div>
+        <div class="steps">
+          <div class="step">Растительное масло</div>
+        </div>
+      </div>
+
+      <div class="group"><div class="group-title">Как готовить</div>
+        <div class="steps">
+          <div class="step"><b>1.</b> Нарезать куриное филе на пласты и проколоть / отбить вилкой, чтобы маринад лучше проник в мясо.</div>
+          <div class="step"><b>2.</b> Смешать молоко, муку, яйцо, соль, чёрный перец, паприку, имбирный и чесночный порошки.</div>
+          <div class="step"><b>3.</b> Залить куриное филе маринадом и оставить на 20 минут.</div>
+          <div class="step"><b>4.</b> Для панировки смешать муку, разрыхлитель и немного воды, затем перетереть руками до сухой крошки.</div>
+          <div class="step"><b>5.</b> Достать курицу из маринада и хорошо обвалять в крошке, прижимая панировку к мясу.</div>
+          <div class="step"><b>6.</b> Разогреть растительное масло на сковороде.</div>
+          <div class="step"><b>7.</b> Жарить на огне чуть выше среднего до золотистой хрустящей корочки и полной готовности внутри.</div>
+        </div>
+      </div>
+
+      <a class="video" href="https://youtu.be/vs1v7NHIukE?si=YzirHaNWH9FFtnn0" target="_blank" rel="noopener noreferrer">
+        <div class="video-title">Видео-рецепт</div>
+        <div class="video-link">Открыть на YouTube ↗</div>
+      </a>
+      <button class="chip" id="addDonkatsuToShopping" type="button" style="margin-top:10px">Добавить недостающее в покупки</button>
+    </div>
   </section>
 </div>
 
@@ -305,6 +356,7 @@ recipeAdded.forEach(item=>{if(!shopping['Продукты — обычные'].i
 const caesarIngredients=['Куриное филе','Кукуруза','Салат айсберг','Помидоры черри','Хлеб для гренок','Чеснок','Соевый соус','Масло','Майонез или греческий йогурт','Горчица','Мёд','Лимонный сок'];
 const chineseChickenIngredients=['Куриная грудка','Кукурузный крахмал','Пищевая сода','Сычуаньский перец','Имбирь','Зелёный лук','Чеснок','Красный перец','Зелёный перец','Кунжут','Растительное масло','Светлый соевый соус','Устричный соус','Соль','Сахар','Куриный бульон / приправа','Чили-масло'];
 const funchozaIngredients=['Фунчоза / стеклянная лапша','Говядина','Соевый соус','Кунжутное масло','Крахмал','Красный лук','Сладкий перец','Огурец','Морковь','Сахар','Рисовый уксус','Паприка','Хлопья чили','Сушёный чеснок','Кунжут','Зелёный лук'];
+const donkatsuIngredients=['Куриное филе','Молоко','Мука','Яйцо','Соль','Чёрный перец','Паприка','Имбирный порошок','Чесночный порошок','Разрыхлитель','Растительное масло'];
 function addCaesarMissingToShopping(){
   const existing=new Set(Object.values(shopping).flat().map(x=>x.toLowerCase()));
   const added=[];
@@ -350,6 +402,25 @@ function addFunchozaMissingToShopping(){
       (item==='Фунчоза / стеклянная лапша' && x.includes('фунчоза')) ||
       (item==='Сладкий перец' && (x.includes('болгарский перец')||x.includes('красный перец'))) ||
       (item==='Зелёный лук' && x.includes('зелёный лук'))
+    );
+    if(!covered){shopping['Продукты — обычные'].push(item);recipeAdded.push(item);existing.add(low);added.push(item)}
+  });
+  recipeAdded=[...new Set(recipeAdded)];localStorage.setItem(recipeAddedKey,JSON.stringify(recipeAdded));
+  renderShopping();renderToday();
+  const toast=document.getElementById('shopToast');
+  document.getElementById('shopToastText').textContent=added.length?`Добавлено в покупки: ${added.length}`:'Всё из рецепта уже есть в покупках';
+  document.getElementById('shopUndo').style.display='none';toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>{toast.classList.remove('show');document.getElementById('shopUndo').style.display=''},3500);
+}
+
+function addDonkatsuMissingToShopping(){
+  const existing=new Set(Object.values(shopping).flat().map(x=>x.toLowerCase()));
+  const added=[];
+  donkatsuIngredients.forEach(item=>{
+    const low=item.toLowerCase();
+    const covered=[...existing].some(x=>
+      x===low ||
+      (item==='Растительное масло' && x.includes('масло подсолнечное')) ||
+      (item==='Куриное филе' && (x.includes('куриное филе')||x.includes('куриная грудка')))
     );
     if(!covered){shopping['Продукты — обычные'].push(item);recipeAdded.push(item);existing.add(low);added.push(item)}
   });
@@ -476,6 +547,7 @@ document.getElementById('addItemForm').addEventListener('submit',e=>{
 document.getElementById('addCaesarToShopping').addEventListener('click',addCaesarMissingToShopping);
 document.getElementById('addChineseChickenToShopping').addEventListener('click',addChineseChickenMissingToShopping);
 document.getElementById('addFunchozaToShopping').addEventListener('click',addFunchozaMissingToShopping);
+document.getElementById('addDonkatsuToShopping').addEventListener('click',addDonkatsuMissingToShopping);
 document.getElementById('shopSearch').addEventListener('input',renderShopping);
 document.querySelectorAll('[data-shopfilter]').forEach(b=>b.addEventListener('click',()=>{shopFilter=b.dataset.shopfilter;setFilterButton(shopFilter);renderShopping()}));
 document.getElementById('shopUndo').addEventListener('click',()=>{if(!lastShopAction)return;const a=lastShopAction;setShopState(a.group,a.item,!a.checked,false);document.getElementById('shopToast').classList.remove('show');lastShopAction=null;});
