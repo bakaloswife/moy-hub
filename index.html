@@ -209,6 +209,41 @@ h1{font-size:30px;line-height:1.05;margin:0;letter-spacing:-.02em}
       </a>
       <button class="chip" id="addChineseChickenToShopping" type="button" style="margin-top:10px">Добавить недостающее в покупки</button>
     </div>
+
+    <div class="card">
+      <h3>Фунчоза с курицей и овощами</h3>
+      <div class="subtle">Быстрая стеклянная лапша с курицей, морковью, болгарским перцем и соусом унаги.</div>
+      <div class="note"><b>Важно:</b> брать именно стеклянную лапшу / фунчозу, а не рисовую — с ней вкус и текстура получаются лучше.</div>
+
+      <div class="group"><div class="group-title">Ингредиенты</div>
+        <div class="steps">
+          <div class="step">Фунчоза / стеклянная лапша — 100 г</div>
+          <div class="step">Куриное филе — 200 г</div>
+          <div class="step">Болгарский перец — 1 шт.</div>
+          <div class="step">Морковь — 1 шт.</div>
+          <div class="step">Чеснок — 1–2 зубчика</div>
+          <div class="step">Паприка — 1 ч. л.</div>
+          <div class="step">Соус унаги — 2 ст. л.</div>
+          <div class="step">Кунжут — 1 ст. л.</div>
+          <div class="step">Растительное масло — 2 ст. л.</div>
+          <div class="step">Соль — по вкусу</div>
+        </div>
+      </div>
+
+      <div class="group"><div class="group-title">Как готовить</div>
+        <div class="steps">
+          <div class="step"><b>1.</b> Залить фунчозу кипятком на 5–7 минут, затем слить воду и промыть лапшу.</div>
+          <div class="step"><b>2.</b> Нарезать курицу небольшими кусочками, посолить, добавить паприку и чеснок.</div>
+          <div class="step"><b>3.</b> Обжарить курицу на растительном масле примерно 5–7 минут до готовности.</div>
+          <div class="step"><b>4.</b> Морковь и болгарский перец нарезать тонкой соломкой и обжарить 2–3 минуты, чтобы овощи остались слегка хрустящими.</div>
+          <div class="step"><b>5.</b> Добавить к овощам курицу, фунчозу и соус унаги.</div>
+          <div class="step"><b>6.</b> Всё хорошо перемешать и прогреть ещё 1–2 минуты.</div>
+          <div class="step"><b>7.</b> Перед подачей посыпать кунжутом.</div>
+        </div>
+      </div>
+
+      <button class="chip" id="addFunchozaToShopping" type="button">Добавить недостающее в покупки</button>
+    </div>
   </section>
 </div>
 
@@ -245,6 +280,7 @@ let recipeAdded=[];try{recipeAdded=JSON.parse(localStorage.getItem(recipeAddedKe
 recipeAdded.forEach(item=>{if(!shopping['Продукты — обычные'].includes(item)) shopping['Продукты — обычные'].push(item)});
 const caesarIngredients=['Куриное филе','Кукуруза','Салат айсберг','Помидоры черри','Хлеб для гренок','Чеснок','Соевый соус','Масло','Майонез или греческий йогурт','Горчица','Мёд','Лимонный сок'];
 const chineseChickenIngredients=['Куриная грудка','Кукурузный крахмал','Пищевая сода','Сычуаньский перец','Имбирь','Зелёный лук','Чеснок','Красный перец','Зелёный перец','Кунжут','Растительное масло','Светлый соевый соус','Устричный соус','Соль','Сахар','Куриный бульон / приправа','Чили-масло'];
+const funchozaIngredients=['Фунчоза / стеклянная лапша','Куриное филе','Болгарский перец','Морковь','Чеснок','Паприка','Соус унаги','Кунжут','Растительное масло','Соль'];
 function addCaesarMissingToShopping(){
   const existing=new Set(Object.values(shopping).flat().map(x=>x.toLowerCase()));
   const added=[];
@@ -271,6 +307,24 @@ function addChineseChickenMissingToShopping(){
       (item==='Растительное масло' && x.includes('масло подсолнечное')) ||
       (item==='Светлый соевый соус' && x.includes('соевый соус')) ||
       (item==='Куриный бульон / приправа' && x.includes('куриный бульон'))
+    );
+    if(!covered){shopping['Продукты — обычные'].push(item);recipeAdded.push(item);existing.add(low);added.push(item)}
+  });
+  recipeAdded=[...new Set(recipeAdded)];localStorage.setItem(recipeAddedKey,JSON.stringify(recipeAdded));
+  renderShopping();renderToday();
+  const toast=document.getElementById('shopToast');
+  document.getElementById('shopToastText').textContent=added.length?`Добавлено в покупки: ${added.length}`:'Всё из рецепта уже есть в покупках';
+  document.getElementById('shopUndo').style.display='none';toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>{toast.classList.remove('show');document.getElementById('shopUndo').style.display=''},3500);
+}
+function addFunchozaMissingToShopping(){
+  const existing=new Set(Object.values(shopping).flat().map(x=>x.toLowerCase()));
+  const added=[];
+  funchozaIngredients.forEach(item=>{
+    const low=item.toLowerCase();
+    const covered=[...existing].some(x=>
+      x===low ||
+      (item==='Фунчоза / стеклянная лапша' && x.includes('фунчоза')) ||
+      (item==='Растительное масло' && x.includes('масло подсолнечное'))
     );
     if(!covered){shopping['Продукты — обычные'].push(item);recipeAdded.push(item);existing.add(low);added.push(item)}
   });
@@ -395,6 +449,7 @@ document.getElementById('addItemForm').addEventListener('submit',e=>{
 });
 document.getElementById('addCaesarToShopping').addEventListener('click',addCaesarMissingToShopping);
 document.getElementById('addChineseChickenToShopping').addEventListener('click',addChineseChickenMissingToShopping);
+document.getElementById('addFunchozaToShopping').addEventListener('click',addFunchozaMissingToShopping);
 document.getElementById('shopSearch').addEventListener('input',renderShopping);
 document.querySelectorAll('[data-shopfilter]').forEach(b=>b.addEventListener('click',()=>{shopFilter=b.dataset.shopfilter;setFilterButton(shopFilter);renderShopping()}));
 document.getElementById('shopUndo').addEventListener('click',()=>{if(!lastShopAction)return;const a=lastShopAction;setShopState(a.group,a.item,!a.checked,false);document.getElementById('shopToast').classList.remove('show');lastShopAction=null;});
