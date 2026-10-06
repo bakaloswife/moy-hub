@@ -54,7 +54,7 @@ h1{font-size:30px;line-height:1.05;margin:0;letter-spacing:-.02em}
 .steps{display:grid;gap:7px;margin-top:8px}.step{background:#171A22;border:1px solid #3E4451;border-radius:14px;padding:10px 12px;font-size:14px;line-height:1.4}.step b{color:#f4b2ca}
 .video{display:block;text-decoration:none;background:#171A22;border:1px solid #434956;border-radius:15px;padding:12px;margin-top:9px}.video-title{font-size:14px;font-weight:700;line-height:1.35}.video-meta{font-size:12px;color:var(--muted);margin-top:4px}.video-link{font-size:12px;color:var(--accent);margin-top:7px}
 .note{border-left:3px solid var(--accent2);padding:9px 11px;background:#15161c;border-radius:0 12px 12px 0;color:#d4ced5;font-size:13px;line-height:1.45;margin-top:10px}
-.bottom{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;width:min(730px,calc(100% - 20px));background:rgba(29,33,43,.96);backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:22px;padding:8px;display:grid;grid-template-columns:repeat(4,1fr);gap:5px;z-index:10;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.bottom{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;width:min(730px,calc(100% - 20px));background:rgba(29,33,43,.96);backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:22px;padding:8px;display:grid;grid-template-columns:repeat(5,1fr);gap:5px;z-index:10;box-shadow:0 12px 40px rgba(0,0,0,.35)}
 .nav{border:0;background:transparent;color:#8f8992;border-radius:16px;padding:10px 4px;font-size:12px}.nav .ico{display:block;font-size:20px;margin-bottom:3px}.nav.active{background:#4A3440;color:#fff;box-shadow:inset 0 0 0 1px #805a6c}.nav.active .ico{filter:none}
 .collapse-btn{flex:1;display:flex;justify-content:space-between;align-items:center;border:0;background:transparent;color:var(--text);padding:0;text-align:left}.group-head{display:flex;align-items:center;gap:8px}.group-head .collapse-btn{min-width:0}.add-item-btn{border:1px solid #65515d;background:#342a33;color:#f4b2ca;border-radius:10px;padding:6px 9px;font-size:12px;font-weight:700;white-space:nowrap;flex:0 0 auto}.delete-mode-btn{border:1px solid #6a4a56;background:transparent;color:#f2abc5;border-radius:10px;padding:6px 9px;font-size:12px;white-space:nowrap}.delete-item-btn{width:24px;height:24px;border-radius:8px;border:1px solid #8b4f5f;background:#3a2028;color:#ffb3c7;font-weight:900;flex:0 0 auto}.collapse-content{margin-top:8px}.hidden{display:none!important}
 .empty{padding:30px 12px;text-align:center;color:var(--muted)}
@@ -62,7 +62,10 @@ h1{font-size:30px;line-height:1.05;margin:0;letter-spacing:-.02em}
 .search{width:100%;border:1px solid #505765;background:#171A22;color:var(--text);border-radius:15px;padding:12px 14px;outline:none}.search:focus{border-color:var(--accent2)}
 .small{font-size:12px;color:var(--muted)}
 .toast{position:fixed;left:50%;bottom:92px;transform:translate(-50%,14px);opacity:0;pointer-events:none;z-index:30;background:#2b303d;border:1px solid #606877;color:#fff;border-radius:16px;padding:11px 12px;box-shadow:0 10px 30px rgba(0,0,0,.35);display:flex;align-items:center;gap:12px;max-width:calc(100% - 28px);transition:.2s ease}.toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}.toast button{border:0;background:var(--accent);color:#21151b;border-radius:10px;padding:7px 10px;font-weight:800}
-@media (min-width:700px){.quick{grid-template-columns:repeat(4,1fr)}.app{padding-top:28px}}
+.czech-tabs{display:flex;gap:8px;overflow:auto;margin-top:12px}.czech-tab{border:1px solid #505765;background:#252A36;color:#ddd6df;border-radius:999px;padding:9px 12px;white-space:nowrap}.czech-tab.active{background:var(--accent);border-color:var(--accent);color:#21151b;font-weight:800}
+.czech-word{display:grid;grid-template-columns:minmax(110px,.8fr) 1.2fr;gap:12px;padding:12px 4px;border-bottom:1px solid rgba(255,255,255,.1)}.czech-word:last-child{border-bottom:none}.czech-cz{font-weight:800;font-size:16px}.czech-ru{font-size:14px;line-height:1.35}.czech-note{font-size:12px;color:var(--muted);margin-top:3px}
+.flashcard{min-height:230px;border:1px solid #555b69;background:linear-gradient(145deg,#252A36,#1B1E27);border-radius:24px;padding:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;user-select:none}.flashcard .front{font-size:30px;font-weight:850;letter-spacing:-.02em}.flashcard .back{font-size:20px;line-height:1.4;margin-top:14px}.flashcard .hint{font-size:12px;color:var(--muted);margin-top:16px}.flash-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.flash-actions button{border:1px solid #555b69;background:#2B303D;color:var(--text);border-radius:13px;padding:11px 8px}.flash-actions .good{background:#264033;border-color:#426c55}.flash-actions .hard{background:#443b28;border-color:#756645}.flash-actions .again{background:#452c35;border-color:#76505d}.review-stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.review-stat .step{text-align:center}.review-stat b{display:block;font-size:20px;margin-bottom:3px}
+@media (min-width:700px){.quick{grid-template-columns:repeat(5,1fr)}.app{padding-top:28px}}
 </style>
 </head>
 <body>
@@ -81,6 +84,7 @@ h1{font-size:30px;line-height:1.05;margin:0;letter-spacing:-.02em}
         <button class="q" data-go="care"><strong>Уход</strong><span>расписание по дням</span></button>
         <button class="q" data-go="workouts"><strong>Тренировки</strong><span>видео на каждый день</span></button>
         <button class="q" data-go="recipes"><strong>Рецепты</strong><span>наши проверенные блюда</span></button>
+        <button class="q" data-go="czech"><strong>Čeština</strong><span>слова, карточки и повторение</span></button>
       </div>
     </div>
     <div class="card" id="todayCard"></div>
@@ -367,6 +371,67 @@ h1{font-size:30px;line-height:1.05;margin:0;letter-spacing:-.02em}
       <button class="chip" id="addLazyLasagnaToShopping" type="button" style="margin-top:10px">Добавить недостающее в покупки</button>
     </div>
   </section>
+
+  <section id="czech" class="section">
+    <div class="card">
+      <h2>Čeština</h2>
+      <div class="subtle">Слова с уроков, карточки и простое интервальное повторение. Для глаголов сохраняю инфинитив.</div>
+      <div class="czech-tabs">
+        <button class="czech-tab active" data-czechtab="words">Слова</button>
+        <button class="czech-tab" data-czechtab="cards">Карточки</button>
+        <button class="czech-tab" data-czechtab="review">Повторение</button>
+      </div>
+    </div>
+
+    <div id="czechWordsPane">
+      <div class="card">
+        <input id="czechSearch" class="search" placeholder="Поиск по чешскому или переводу…" />
+        <div class="small" id="czechWordCount" style="margin-top:10px"></div>
+      </div>
+      <div class="card" id="czechWordsList"></div>
+    </div>
+
+    <div id="czechCardsPane" class="hidden">
+      <div class="card">
+        <div class="small" id="czechCardProgress" style="margin-bottom:10px"></div>
+        <div class="flashcard" id="czechFlashcard" role="button" tabindex="0" aria-label="Показать перевод">
+          <div class="front" id="czechCardFront"></div>
+          <div class="back hidden" id="czechCardBack"></div>
+          <div class="hint" id="czechCardHint">Нажми на карточку, чтобы увидеть перевод</div>
+        </div>
+        <div class="sheet-actions">
+          <button id="czechPrev" type="button">← Назад</button>
+          <button id="czechShuffle" type="button">Перемешать</button>
+          <button id="czechNext" type="button">Дальше →</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="czechReviewPane" class="hidden">
+      <div class="card">
+        <h3>Повторение</h3>
+        <div class="subtle">Сначала показываются слова, срок повторения которых уже наступил. «Знаю» увеличивает интервал, «Сложно» оставляет короткий интервал, «Ещё раз» возвращает слово в текущую сессию.</div>
+        <div class="review-stat">
+          <div class="step"><b id="reviewDueCount">0</b><span class="small">сейчас</span></div>
+          <div class="step"><b id="reviewKnownCount">0</b><span class="small">изучено</span></div>
+          <div class="step"><b id="reviewHardCount">0</b><span class="small">сложные</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="small" id="reviewProgress" style="margin-bottom:10px"></div>
+        <div class="flashcard" id="reviewFlashcard" role="button" tabindex="0" aria-label="Показать перевод">
+          <div class="front" id="reviewFront"></div>
+          <div class="back hidden" id="reviewBack"></div>
+          <div class="hint" id="reviewHint">Сначала вспомни перевод, потом нажми</div>
+        </div>
+        <div class="flash-actions">
+          <button class="again" id="reviewAgain" type="button">Ещё раз</button>
+          <button class="hard" id="reviewHard" type="button">Сложно</button>
+          <button class="good" id="reviewGood" type="button">Знаю</button>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
 
 <div id="addItemSheet" class="sheet-backdrop" hidden aria-hidden="true"><form id="addItemForm" class="add-sheet" role="dialog" aria-modal="true" aria-labelledby="addItemTitle"><h3 id="addItemTitle">Добавить покупку</h3><div id="addItemCategory" class="sheet-category"></div><input id="newShopItem" class="sheet-input" type="text" maxlength="120" placeholder="Например, молоко" autocomplete="off" required /><div class="sheet-actions"><button id="cancelAddItem" type="button">Отмена</button><button class="sheet-submit" type="submit">Добавить</button></div></form></div>
@@ -377,6 +442,7 @@ h1{font-size:30px;line-height:1.05;margin:0;letter-spacing:-.02em}
   <button class="nav" data-section="shopping"><span class="ico">🛒</span>Покупки</button>
   <button class="nav" data-section="care"><span class="ico">◌</span>Уход</button>
   <button class="nav" data-section="workouts"><span class="ico">↗</span>Тренировки</button>
+  <button class="nav" data-section="czech"><span class="ico">ČJ</span>Čeština</button>
 </nav>
 
 <script>
@@ -661,11 +727,150 @@ function renderToday(){
  document.getElementById('todayCard').innerHTML=`<h2>Сегодня</h2><div class="steps"><div class="step"><b>Уход вечером:</b> ${c[1].replace(/^Вечер:\s*/,'')}</div><div class="step"><b>Тренировка:</b> ${w.title}${w.video?' — '+w.video:''}</div><div class="step"><b>Ближайшие покупки:</b><div style="margin-top:6px;line-height:1.5">${preview||'Ничего срочного'}</div>${more}</div></div>`;
 }
 
+
+const czechWords=[
+  {cz:'spěchat',ru:'спешить, торопиться',note:'глагол, инфинитив'},
+  {cz:'zdvořilý',ru:'вежливый',note:'жен. zdvořilá'},
+  {cz:'doporučovat',ru:'рекомендовать, советовать',note:'глагол, несов. вид; doporučit — порекомендовать'},
+  {cz:'najít',ru:'найти',note:'глагол; našel — нашёл'},
+  {cz:'začít',ru:'начать',note:'глагол, инфинитив'},
+  {cz:'žádat',ru:'просить, запрашивать',note:'глагол; žádat o pomoc — просить о помощи'},
+  {cz:'nepořádný',ru:'неряшливый, неаккуратный',note:'про человека/порядок'},
+  {cz:'neupravený',ru:'неопрятный',note:'чаще про внешний вид'},
+  {cz:'chytrý',ru:'умный',note:'жен. chytrá'},
+  {cz:'mazaný',ru:'хитрый, ушлый',note:'разговорное'},
+  {cz:'osamělý',ru:'одинокий',note:'жен. osamělá'},
+  {cz:'vulgární',ru:'вульгарный, неприличный',note:''},
+  {cz:'sprostý',ru:'грубый, неприличный',note:''},
+  {cz:'sobecký',ru:'эгоистичный, себялюбивый',note:''},
+  {cz:'egoistický',ru:'эгоистичный',note:''},
+  {cz:'stupidní',ru:'тупой, глупый',note:''},
+  {cz:'hloupý',ru:'глупый',note:''},
+  {cz:'šikovný',ru:'умелый, способный, ловкий',note:'жен. šikovná'},
+  {cz:'zodpovědný',ru:'ответственный',note:'жен. zodpovědná'},
+  {cz:'zvědavý',ru:'любопытный',note:'интересно узнать что-то конкретное'},
+  {cz:'zvídavý',ru:'любознательный',note:'любит узнавать новое'},
+  {cz:'hodný',ru:'добрый, хороший, послушный',note:'жен. hodná'},
+  {cz:'upřímný',ru:'искренний, честный, прямой',note:'жен. upřímná'},
+  {cz:'statečný',ru:'смелый, храбрый',note:'жен. statečná'},
+  {cz:'spolehlivý',ru:'надёжный',note:'жен. spolehlivá'},
+  {cz:'protivný',ru:'противный, неприятный',note:'жен. protivná'},
+  {cz:'frajer',ru:'крутой парень, красавчик; парень',note:'разговорное; frajeřit — выпендриваться'},
+  {cz:'milý',ru:'милый, приятный, добрый',note:'жен. milá'},
+  {cz:'příjemný',ru:'приятный',note:'жен. příjemná'},
+  {cz:'sympatický',ru:'симпатичный, приятный',note:'жен. sympatická'},
+  {cz:'pesimistický',ru:'пессимистичный',note:'жен. pesimistická'},
+  {cz:'smutný',ru:'грустный',note:'жен. smutná'},
+  {cz:'optimistický',ru:'оптимистичный',note:'жен. optimistická'},
+  {cz:'veselý',ru:'весёлый',note:'жен. veselá'}
+];
+const czechReviewKey='myhub-czech-review-v1';
+let czechReview={};try{czechReview=JSON.parse(localStorage.getItem(czechReviewKey)||'{}')}catch(e){czechReview={}}
+const reviewIntervals=[1,3,7,14,30,60];
+let czechDeck=[...czechWords];
+let czechCardIndex=0;
+let czechCardRevealed=false;
+let reviewQueue=[];
+let reviewIndex=0;
+let reviewRevealed=false;
+
+function renderCzechWords(){
+  const root=document.getElementById('czechWordsList');
+  if(!root)return;
+  const term=(document.getElementById('czechSearch')?.value||'').trim().toLocaleLowerCase('cs-CZ');
+  const rows=czechWords.filter(w=>!term || (w.cz+' '+w.ru+' '+w.note).toLocaleLowerCase('cs-CZ').includes(term));
+  document.getElementById('czechWordCount').textContent=`${rows.length} из ${czechWords.length} слов`;
+  root.innerHTML=rows.map(w=>`<div class="czech-word"><div class="czech-cz">${w.cz}</div><div><div class="czech-ru">${w.ru}</div>${w.note?`<div class="czech-note">${w.note}</div>`:''}</div></div>`).join('') || '<div class="empty">Ничего не найдено</div>';
+}
+
+function setCzechTab(tab){
+  document.querySelectorAll('[data-czechtab]').forEach(b=>b.classList.toggle('active',b.dataset.czechtab===tab));
+  document.getElementById('czechWordsPane').classList.toggle('hidden',tab!=='words');
+  document.getElementById('czechCardsPane').classList.toggle('hidden',tab!=='cards');
+  document.getElementById('czechReviewPane').classList.toggle('hidden',tab!=='review');
+  if(tab==='cards')renderCzechCard();
+  if(tab==='review'){buildReviewQueue();renderReviewCard()}
+}
+
+function renderCzechCard(){
+  if(!czechDeck.length)return;
+  czechCardIndex=(czechCardIndex+czechDeck.length)%czechDeck.length;
+  const w=czechDeck[czechCardIndex];
+  document.getElementById('czechCardProgress').textContent=`${czechCardIndex+1} / ${czechDeck.length}`;
+  document.getElementById('czechCardFront').textContent=w.cz;
+  const back=document.getElementById('czechCardBack');
+  back.innerHTML=`<b>${w.ru}</b>${w.note?`<div class="czech-note" style="margin-top:8px">${w.note}</div>`:''}`;
+  back.classList.toggle('hidden',!czechCardRevealed);
+  document.getElementById('czechCardHint').textContent=czechCardRevealed?'Нажми ещё раз, чтобы скрыть перевод':'Нажми на карточку, чтобы увидеть перевод';
+}
+function toggleCzechCard(){czechCardRevealed=!czechCardRevealed;renderCzechCard()}
+function moveCzechCard(delta){czechCardIndex=(czechCardIndex+delta+czechDeck.length)%czechDeck.length;czechCardRevealed=false;renderCzechCard()}
+function shuffleCzechDeck(){for(let i=czechDeck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[czechDeck[i],czechDeck[j]]=[czechDeck[j],czechDeck[i]]}czechCardIndex=0;czechCardRevealed=false;renderCzechCard()}
+
+function wordReviewState(cz){return czechReview[cz]||{level:0,next:0,hard:0,known:0}}
+function buildReviewQueue(){
+  const nowTs=Date.now();
+  const due=czechWords.filter(w=>(wordReviewState(w.cz).next||0)<=nowTs);
+  reviewQueue=due.length?due:[...czechWords].sort((a,b)=>(wordReviewState(a.cz).next||0)-(wordReviewState(b.cz).next||0)).slice(0,10);
+  reviewIndex=0;reviewRevealed=false;renderReviewStats();
+}
+function renderReviewStats(){
+  const nowTs=Date.now();
+  const due=czechWords.filter(w=>(wordReviewState(w.cz).next||0)<=nowTs).length;
+  const known=czechWords.filter(w=>(wordReviewState(w.cz).known||0)>0).length;
+  const hard=czechWords.filter(w=>(wordReviewState(w.cz).hard||0)>0).length;
+  document.getElementById('reviewDueCount').textContent=due;
+  document.getElementById('reviewKnownCount').textContent=known;
+  document.getElementById('reviewHardCount').textContent=hard;
+}
+function renderReviewCard(){
+  if(!reviewQueue.length){buildReviewQueue();return}
+  if(reviewIndex>=reviewQueue.length)reviewIndex=0;
+  const w=reviewQueue[reviewIndex];
+  document.getElementById('reviewProgress').textContent=`${reviewIndex+1} / ${reviewQueue.length} на эту сессию`;
+  document.getElementById('reviewFront').textContent=w.cz;
+  const back=document.getElementById('reviewBack');
+  back.innerHTML=`<b>${w.ru}</b>${w.note?`<div class="czech-note" style="margin-top:8px">${w.note}</div>`:''}`;
+  back.classList.toggle('hidden',!reviewRevealed);
+  document.getElementById('reviewHint').textContent=reviewRevealed?'Оцени, насколько легко вспомнилось':'Сначала вспомни перевод, потом нажми';
+}
+function toggleReviewCard(){reviewRevealed=!reviewRevealed;renderReviewCard()}
+function rateReview(kind){
+  if(!reviewQueue.length)return;
+  const w=reviewQueue[reviewIndex];
+  const st=wordReviewState(w.cz);
+  const day=24*60*60*1000;
+  if(kind==='again'){st.level=0;st.hard=(st.hard||0)+1;st.next=Date.now()+10*60*1000}
+  if(kind==='hard'){st.level=Math.max(0,Math.min(st.level||0,1));st.hard=(st.hard||0)+1;st.next=Date.now()+day}
+  if(kind==='good'){st.level=Math.min((st.level||0)+1,reviewIntervals.length);st.known=(st.known||0)+1;st.hard=Math.max(0,(st.hard||0)-1);const days=reviewIntervals[Math.max(0,st.level-1)]||60;st.next=Date.now()+days*day}
+  czechReview[w.cz]=st;localStorage.setItem(czechReviewKey,JSON.stringify(czechReview));
+  reviewQueue.splice(reviewIndex,1);
+  if(kind==='again')reviewQueue.push(w);
+  if(reviewIndex>=reviewQueue.length)reviewIndex=0;
+  reviewRevealed=false;
+  renderReviewStats();
+  if(!reviewQueue.length)buildReviewQueue();else renderReviewCard();
+}
+
+document.querySelectorAll('[data-czechtab]').forEach(b=>b.addEventListener('click',()=>setCzechTab(b.dataset.czechtab)));
+document.getElementById('czechSearch')?.addEventListener('input',renderCzechWords);
+document.getElementById('czechFlashcard')?.addEventListener('click',toggleCzechCard);
+document.getElementById('czechFlashcard')?.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleCzechCard()}});
+document.getElementById('czechPrev')?.addEventListener('click',()=>moveCzechCard(-1));
+document.getElementById('czechNext')?.addEventListener('click',()=>moveCzechCard(1));
+document.getElementById('czechShuffle')?.addEventListener('click',shuffleCzechDeck);
+document.getElementById('reviewFlashcard')?.addEventListener('click',toggleReviewCard);
+document.getElementById('reviewFlashcard')?.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleReviewCard()}});
+document.getElementById('reviewAgain')?.addEventListener('click',()=>rateReview('again'));
+document.getElementById('reviewHard')?.addEventListener('click',()=>rateReview('hard'));
+document.getElementById('reviewGood')?.addEventListener('click',()=>rateReview('good'));
+renderCzechWords();
+
 function showSection(id){document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===id));document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.section===id));window.scrollTo({top:0,behavior:'smooth'})}
 document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>showSection(b.dataset.section)));
 document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>showSection(b.dataset.go)));
 
-renderShopping();renderCareBlock('careMe',careMe);renderCareBlock('careNikita',careNikita);renderWorkouts();renderToday();
+renderShopping();renderCareBlock('careMe',careMe);renderCareBlock('careNikita',careNikita);renderWorkouts();renderToday();renderReviewStats();
 </script>
 </body>
 </html>
