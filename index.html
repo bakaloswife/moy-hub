@@ -65,6 +65,14 @@ h1{font-size:30px;line-height:1.05;margin:0;letter-spacing:-.02em}
 .czech-tabs{display:flex;gap:8px;overflow:auto;margin-top:12px}.czech-tab{border:1px solid #505765;background:#252A36;color:#ddd6df;border-radius:999px;padding:9px 12px;white-space:nowrap}.czech-tab.active{background:var(--accent);border-color:var(--accent);color:#21151b;font-weight:800}
 .czech-word{display:grid;grid-template-columns:minmax(110px,.8fr) 1.2fr;gap:12px;padding:12px 4px;border-bottom:1px solid rgba(255,255,255,.1)}.czech-word:last-child{border-bottom:none}.czech-cz{font-weight:800;font-size:16px}.czech-ru{font-size:14px;line-height:1.35}.czech-note{font-size:12px;color:var(--muted);margin-top:3px}
 .flashcard{min-height:230px;border:1px solid #555b69;background:linear-gradient(145deg,#252A36,#1B1E27);border-radius:24px;padding:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;user-select:none}.flashcard .front{font-size:30px;font-weight:850;letter-spacing:-.02em}.flashcard .back{font-size:20px;line-height:1.4;margin-top:14px}.flashcard .hint{font-size:12px;color:var(--muted);margin-top:16px}.flash-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.flash-actions button{border:1px solid #555b69;background:#2B303D;color:var(--text);border-radius:13px;padding:11px 8px}.flash-actions .good{background:#264033;border-color:#426c55}.flash-actions .hard{background:#443b28;border-color:#756645}.flash-actions .again{background:#452c35;border-color:#76505d}.review-stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.review-stat .step{text-align:center}.review-stat b{display:block;font-size:20px;margin-bottom:3px}
+
+/* recipe-collapse-v1 */
+#recipes>.card.recipe-card>h3{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;user-select:none;margin:0}
+#recipes>.card.recipe-card>h3::after{content:'⌄';font-size:20px;color:var(--accent);transition:transform .18s ease;flex:0 0 auto}
+#recipes>.card.recipe-card.recipe-open>h3::after{transform:rotate(180deg)}
+#recipes>.card.recipe-card:not(.recipe-open)>:not(h3){display:none}
+#recipes>.card.recipe-card:not(.recipe-open){padding-top:16px;padding-bottom:16px}
+
 @media (min-width:700px){.quick{grid-template-columns:repeat(5,1fr)}.app{padding-top:28px}}
 </style>
 </head>
@@ -370,7 +378,39 @@ h1{font-size:30px;line-height:1.05;margin:0;letter-spacing:-.02em}
       </a>
       <button class="chip" id="addLazyLasagnaToShopping" type="button" style="margin-top:10px">Добавить недостающее в покупки</button>
     </div>
-  </section>
+  
+    <div class="card">
+      <h3>Наш рамен</h3>
+      <div class="subtle">Наш домашний вариант со свининой, яйцом, пореем и насыщенным бульоном.</div>
+
+      <div class="group"><div class="group-title">Ингредиенты</div>
+        <div class="steps">
+          <div class="step">Вода — 2,5 л</div>
+          <div class="step">Бульон Knorr в ванночках — 2 шт.</div>
+          <div class="step">Свинина / свиные стейки — 400–600 г</div>
+          <div class="step">Рисовая лапша — 250–300 г</div>
+          <div class="step">Яйца — 3–4 шт.</div>
+          <div class="step">Лук-порей — по вкусу</div>
+          <div class="step">Ramen-заправка — начать с 2 ст. л., дальше по вкусу</div>
+          <div class="step">Устричный соус — 1 ст. л.; при необходимости ещё ½–1 ст. л.</div>
+          <div class="step">Кунжутное масло — 1–1,5 ст. л.</div>
+        </div>
+      </div>
+
+      <div class="group"><div class="group-title">Как готовить</div>
+        <div class="steps">
+          <div class="step"><b>1.</b> В 2,5 л воды растворить 2 ванночки Knorr. Добавить нарезанный порей и варить 10–15 минут.</div>
+          <div class="step"><b>2.</b> Свинину обжарить примерно по 2–4 минуты с каждой стороны, затем нарезать.</div>
+          <div class="step"><b>3.</b> Яйца варить 6,5–7 минут, после сразу охладить и очистить.</div>
+          <div class="step"><b>4.</b> Лапшу приготовить отдельно по инструкции и разложить по мискам.</div>
+          <div class="step"><b>5.</b> В бульон добавить 2 ст. л. ramen-заправки и 1 ст. л. устричного соуса. Попробовать и при необходимости добавить ещё немного.</div>
+          <div class="step"><b>6.</b> Выключить огонь и вмешать 1–1,5 ст. л. кунжутного масла.</div>
+          <div class="step"><b>7.</b> Собрать рамен: лапша → горячий бульон → свинина → половинки яиц → зелёная часть порея.</div>
+        </div>
+      </div>
+    </div>
+
+</section>
 
   <section id="czech" class="section">
     <div class="card">
@@ -893,6 +933,29 @@ document.getElementById('reviewAgain')?.addEventListener('click',()=>rateReview(
 document.getElementById('reviewHard')?.addEventListener('click',()=>rateReview('hard'));
 document.getElementById('reviewGood')?.addEventListener('click',()=>rateReview('good'));
 renderCzechWords();
+
+
+function initRecipeCollapse(){
+  const cards=[...document.querySelectorAll('#recipes > .card')].slice(1);
+  cards.forEach(card=>{
+    card.classList.add('recipe-card');
+    card.classList.remove('recipe-open');
+    const title=card.querySelector('h3');
+    if(!title)return;
+    title.setAttribute('role','button');
+    title.setAttribute('tabindex','0');
+    title.setAttribute('aria-expanded','false');
+    const toggle=()=>{
+      const open=card.classList.toggle('recipe-open');
+      title.setAttribute('aria-expanded',open?'true':'false');
+    };
+    title.addEventListener('click',toggle);
+    title.addEventListener('keydown',e=>{
+      if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle()}
+    });
+  });
+}
+initRecipeCollapse();
 
 function showSection(id){document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===id));document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.section===id));window.scrollTo({top:0,behavior:'smooth'})}
 document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>showSection(b.dataset.section)));
