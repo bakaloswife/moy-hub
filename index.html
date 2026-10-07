@@ -568,7 +568,25 @@ function addLazyLasagnaMissingToShopping(){
 const presetDone=new Set(shopping['Куплено / уже есть']);
 const key='myhub-shopping-v1';
 let saved={};try{saved=JSON.parse(localStorage.getItem(key)||'{}')}catch(e){}
-function itemId(group,item){return btoa(unescape(encodeURIComponent(group+'|'+item))).replace(/=/g,'')}
+
+// Стабильный ID покупки: не зависит от раздела.
+// Поэтому перенос товара между категориями/месяцами после обновления сайта
+// больше не сбрасывает отметку «куплено».
+function encodeShopId(value){return btoa(unescape(encodeURIComponent(value))).replace(/=/g,'')}
+function itemId(group,item){return encodeShopId(item.trim().toLocaleLowerCase('ru-RU'))}
+function legacyItemId(group,item){return encodeShopId(group+'|'+item)}
+
+// Миграция старых отметок, где ID зависел от названия раздела.
+let shoppingStateMigrated=false;
+Object.entries(shopping).forEach(([group,items])=>items.forEach(item=>{
+  const oldId=legacyItemId(group,item);
+  const newId=itemId(group,item);
+  if(saved[oldId]!==undefined){
+    if(saved[newId]===undefined || saved[oldId]===true) saved[newId]=saved[oldId];
+    shoppingStateMigrated=true;
+  }
+}));
+if(shoppingStateMigrated)localStorage.setItem(key,JSON.stringify(saved));
 let shopFilter='open';
 const deleteModeGroups=new Set();
 let lastShopAction=null;
