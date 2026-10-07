@@ -790,7 +790,7 @@ function renderCzechWords(){
   if(!root)return;
   const term=(document.getElementById('czechSearch')?.value||'').trim().toLocaleLowerCase('cs-CZ');
   const rows=czechWords.filter(w=>!term || (w.cz+' '+w.ru+' '+w.note).toLocaleLowerCase('cs-CZ').includes(term));
-  document.getElementById('czechWordCount').textContent=`${rows.length} из ${czechWords.length} слов`;
+  const countEl=document.getElementById('czechWordCount');if(countEl)countEl.textContent=`${rows.length} из ${czechWords.length} слов`;
   root.innerHTML=rows.map(w=>`<div class="czech-word"><div class="czech-cz">${w.cz}</div><div><div class="czech-ru">${w.ru}</div>${w.note?`<div class="czech-note">${w.note}</div>`:''}</div></div>`).join('') || '<div class="empty">Ничего не найдено</div>';
 }
 
@@ -830,9 +830,8 @@ function renderReviewStats(){
   const due=czechWords.filter(w=>(wordReviewState(w.cz).next||0)<=nowTs).length;
   const known=czechWords.filter(w=>(wordReviewState(w.cz).known||0)>0).length;
   const hard=czechWords.filter(w=>(wordReviewState(w.cz).hard||0)>0).length;
-  document.getElementById('reviewDueCount').textContent=due;
-  document.getElementById('reviewKnownCount').textContent=known;
-  document.getElementById('reviewHardCount').textContent=hard;
+  const dueEl=document.getElementById('reviewDueCount'),knownEl=document.getElementById('reviewKnownCount'),hardEl=document.getElementById('reviewHardCount');
+  if(dueEl)dueEl.textContent=due;if(knownEl)knownEl.textContent=known;if(hardEl)hardEl.textContent=hard;
 }
 function renderReviewCard(){
   if(!reviewQueue.length){buildReviewQueue();return}
