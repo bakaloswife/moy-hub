@@ -144,7 +144,6 @@ h1{font-size:30px;line-height:1.05;margin:0;letter-spacing:-.02em}
 
       <div class="group"><div class="group-title">Активы</div>
         <div class="steps">
-          <div class="step"><b>The Wishlist Niacinamide + Zinc</b><br><span class="subtle">Помогает с жирностью, порами, неровной текстурой и поддерживает кожный барьер. Сейчас — утром, если не сушит и не стягивает.</span></div>
           <div class="step"><b>KOEC с ниацинамидом</b><br><span class="subtle">Ниацинамид + лёгкое увлажнение. Если от него стягивает кожу, не заставляем себя использовать его каждый день.</span></div>
           <div class="step"><b>Revox Azelaic Acid 10%</b><br><span class="subtle">Азелаиновая кислота: помогает с покраснением, пятнами после воспалений, забитыми порами и мелкими высыпаниями. Используем вечером по расписанию.</span></div>
           <div class="step"><b>Garnier с салициловой кислотой</b><br><span class="subtle">Салициловая кислота очищает поры изнутри, уменьшает сальные нити и «колючки» на носу. Использовать не каждый день.</span></div>
@@ -789,11 +788,11 @@ document.querySelectorAll('[data-shopfilter]').forEach(b=>b.addEventListener('cl
 document.getElementById('shopUndo').addEventListener('click',()=>{if(!lastShopAction)return;const a=lastShopAction;setShopState(a.group,a.item,!a.checked,false);document.getElementById('shopToast').classList.remove('show');lastShopAction=null;});
 
 const careMe={
-1:['Утро: вода → ниацинамидовый крем → при сухости The Ordinary NMF + HA → SPF → макияж','Вечер: мягкое очищение → Revox Azelaic Acid 10% → The Ordinary NMF + HA'],
-2:['Утро: вода → ниацинамидовый крем → при сухости The Ordinary NMF + HA → SPF → макияж','Вечер: мягкое очищение → BHA 2% на нос и лоб → увлажняющий крем'],
-3:['Утро: вода → ниацинамидовый крем → при сухости The Ordinary NMF + HA → SPF → макияж','Вечер: мягкое очищение → Revox Azelaic Acid 10% → крем'],
-4:['Утро: вода → ниацинамидовый крем → при сухости The Ordinary NMF + HA → SPF → макияж','Вечер: мягкое очищение → только увлажняющий крем'],
-5:['Утро: вода → ниацинамидовый крем → при сухости The Ordinary NMF + HA → SPF → макияж','Вечер: мягкое очищение → Revox Azelaic Acid 10% → крем'],
+1:['Утро: вода → The Ordinary NMF + HA → SPF → макияж','Вечер: мягкое очищение → Revox Azelaic Acid 10% → The Ordinary NMF + HA'],
+2:['Утро: вода → The Ordinary NMF + HA → SPF → макияж','Вечер: мягкое очищение → BHA 2% на нос и лоб → увлажняющий крем'],
+3:['Утро: вода → The Ordinary NMF + HA → SPF → макияж','Вечер: мягкое очищение → Revox Azelaic Acid 10% → крем'],
+4:['Утро: вода → The Ordinary NMF + HA → SPF → макияж','Вечер: мягкое очищение → только увлажняющий крем'],
+5:['Утро: вода → The Ordinary NMF + HA → SPF → макияж','Вечер: мягкое очищение → Revox Azelaic Acid 10% → крем'],
 6:['Утро: вода → SPF; при сухости обычный крем','Вечер: мягкое очищение → увлажняющий крем'],
 0:['Утро: вода → SPF; при сухости обычный крем','Вечер: мягкое очищение → увлажняющий крем']};
 const careNikita={
