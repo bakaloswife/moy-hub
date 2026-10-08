@@ -30,8 +30,10 @@ const training=panel('🏋️ Тренировка сегодня');
 const workoutTitle=make('div','home-title'),workoutSub=make('div','home-muted');
 const video=make('a','video','Открыть плейлист ↗');video.target='_blank';video.rel='noopener noreferrer';
 training.append(workoutTitle,workoutSub,video);
-const playlistShortcuts=make('div','home-card-bottom');
-playlistShortcuts.style.flexWrap='wrap';
+const playlistShortcuts=make('div','home-card-bottom home-playlist-grid');
+playlistShortcuts.style.display='grid';
+playlistShortcuts.style.gridTemplateColumns='repeat(2, minmax(0, 1fr))';
+playlistShortcuts.style.gap='9px';
 for(const key of ['stretching','mobility','core','workout']){
   const p=playlists[key];const link=make('a','chip',p.name);link.href=p.url;link.target='_blank';link.rel='noopener noreferrer';link.style.textDecoration='none';
   playlistShortcuts.append(link);
