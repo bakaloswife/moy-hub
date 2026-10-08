@@ -75,6 +75,7 @@ h1{font-size:30px;line-height:1.05;margin:0;letter-spacing:-.02em}
 
 @media (min-width:700px){.quick{grid-template-columns:repeat(5,1fr)}.app{padding-top:28px}}
 </style>
+<link rel="stylesheet" href="home-dashboard.css?v=1">
 </head>
 <body>
 <div class="app">
@@ -522,8 +523,8 @@ h1{font-size:30px;line-height:1.05;margin:0;letter-spacing:-.02em}
 <nav class="bottom">
   <button class="nav active" data-section="home"><span class="ico">⌂</span>Главная</button>
   <button class="nav" data-section="shopping"><span class="ico">🛒</span>Покупки</button>
-  <button class="nav" data-section="care"><span class="ico">◌</span>Уход</button>
   <button class="nav" data-section="workouts"><span class="ico">↗</span>Тренировки</button>
+  <button class="nav" data-section="care"><span class="ico">◌</span>Уход</button>
   <button class="nav" data-section="czech"><span class="ico">ČJ</span>Čeština</button>
 </nav>
 
@@ -1012,6 +1013,7 @@ document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=
 
 renderShopping();renderCareBlock('careMe',careMe);renderCareBlock('careNikita',careNikita);renderWorkouts();renderToday();renderReviewStats();
 </script>
+<script src="home-dashboard.js?v=1"></script>
 </body>
 </html>
 
