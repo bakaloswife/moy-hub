@@ -534,12 +534,13 @@ const now=new Date();
 document.getElementById('todayDate').innerHTML=`${DOW[now.getDay()]}<br>${now.toLocaleDateString('ru-RU',{day:'2-digit',month:'long'})}`;
 
 const shopping={
+ 'Срочно купить':[
+  'Malá powerbanka (маленький павербанк)','Denní slipové vložky (ежедневные прокладки)'],
  'Купить в ближайшее время':[
-  'Malá powerbanka (маленький павербанк)','Denní slipové vložky (ежедневные прокладки)',
-  'Tyčinkový aroma difuzér na WC (палочковый ароматизатор в туалет)','Struhadlo na korejskou mrkev (тёрка для корейской морковки)','Kelímek na zubní kartáčky (стакан для зубных щёток)','Pilník na nehty (пилочка для ногтей)','Kleštičky na řasy (керлер / завиватель для ресниц)','Černý svetr, stejný jako bílý chlupatý (чёрный свитер, как белый махровый)','Hezké šaty na podzim/zimu (красивое платье на осень/зиму)','Magnetické řasy bez lepidla – horní + spodní pásek (магнитные ресницы без клея)'],
+  'Struhadlo na korejskou mrkev (тёрка для корейской морковки)','Kelímek na zubní kartáčky (стакан для зубных щёток)','Pilník na nehty (пилочка для ногтей)','Kleštičky na řasy (керлер / завиватель для ресниц)','Černý svetr, stejný jako bílý chlupatý (чёрный свитер, как белый махровый)','Hezké šaty na podzim/zimu (красивое платье на осень/зиму)','Magnetické řasy bez lepidla – horní + spodní pásek (магнитные ресницы без клея)'],
  'Продукты — обычные':[
   'Tuhé mýdlo na nádobí / jádrové mýdlo (твёрдое мыло для посуды / хозяйственное мыло)',
-  'Máslo (сливочное масло)','Kukuřičný škrob (кукурузный крахмал)','Sýr (сыр)','Majonéza (майонез)','Mrkev (морковь)','Cibule (лук)','Actimel nebo jogurty (Actimel или йогурты)','Slunečnicový olej (подсолнечное масло)','Smetana (сливки)','Pivo (пиво)','Mražená zelenina (замороженные овощи)','Lékařský líh / Alcohol disinfector / Sprit','Banány (бананы)','Skleněné nudle / funčóza (фунчоза)','Červená cibule (красный лук)','Červená paprika (красный перец)','Okurka (огурец)'],
+  'Máslo (сливочное масло)','Kukuřičný škrob (кукурузный крахмал)','Sýr (сыр)','Mražená zelenina (замороженные овощи)','Skleněné nudle / funčóza (фунчоза)',],
  'Плановые покупки по надобности':[
   'essence 8h Matte Liquid Lipstick 15 Vintage Rose','essence Hydra Kiss Lip Oil 01 Kiss From A Rose','essence Get BIG! Lashes Curl Boost','Botník / stojan na boty (подставка для обуви)','Náhradní návlek na mop; když nenajdeme, koupit nový mop (насадка на швабру; если не найдём — новая швабра)','Hnědá tužka na oči (коричневый карандаш для глаз)','USB-C nabíječka (блок зарядки USB-C)','Fén s difuzérem (фен с диффузором)','Holicí strojek (машинка для бритья)','Superlux HD-681 Evo sluchátka (наушники)','Řasenka se zahnutým kartáčkem (тушь с изогнутой щёточкой)','Průhledná růžová báze na nehty (прозрачная розовая база для ногтей)','Teplá velká domácí mikina jako v KiK (тёплая большая домашняя кофта)','Teplé domácí bačkory ve stylu UGG (тёплые угги-тапки)','UV lampa na nehty (УФ-лампа для ногтей)','Hodinky Huawei (часы Huawei)','Micro-USB kabel pro véčko (кабель для раскладушки)','Digitální fotoaparát / 4K kamera (цифровой фотоаппарат / 4K-камера)','The Ordinary Caffeine Solution 5% + EGCG','La Roche-Posay Cicaplast Baume B5+'],
  'Куплено / уже есть':[
@@ -676,9 +677,13 @@ const deleteModeGroups=new Set();
 let lastShopAction=null;
 let toastTimer=null;
 let addItemGroup=null;
+const deletedItemsKey='myhub-shopping-deleted-v1';
+let deletedItems=[];try{deletedItems=JSON.parse(localStorage.getItem(deletedItemsKey)||'[]')}catch(e){}
+if(!Array.isArray(deletedItems))deletedItems=[];
 const customItemsKey='myhub-shopping-custom-v1';
 let customItems={};try{customItems=JSON.parse(localStorage.getItem(customItemsKey)||'{}')}catch(e){customItems={}}
 Object.entries(customItems).forEach(([group,items])=>{if(shopping[group]&&Array.isArray(items))items.forEach(item=>{if(typeof item==='string'&&!shopping[group].includes(item))shopping[group].push(item)})});
+Object.keys(shopping).forEach(group=>{shopping[group]=shopping[group].filter(item=>!deletedItems.includes(itemId(group,item)))});
 function setFilterButton(filter){
   document.querySelectorAll('[data-shopfilter]').forEach(x=>x.classList.toggle('active',x.dataset.shopfilter===filter));
 }
@@ -725,7 +730,7 @@ function renderShopping(){
     Object.entries(shopping).forEach(([group,items])=>{
       if(group==='Куплено / уже есть' && shopFilter==='open') return;
       const wrap=document.createElement('div');wrap.className='card';
-      const badge=group==='Купить в ближайшее время'?'<span class="badge now">сейчас</span>':group==='Плановые покупки по надобности'?'<span class="badge later">планово</span>':'';
+      const badge=group==='Срочно купить'?'<span class="badge now">срочно</span>':group==='Купить в ближайшее время'?'<span class="badge now">сейчас</span>':group==='Плановые покупки по надобности'?'<span class="badge later">планово</span>':'';
       wrap.innerHTML=`<div class="group-head"><button class="collapse-btn"><h3>${group}${badge}</h3><span>⌄</span></button><button class="add-item-btn" type="button">+ Добавить</button><button class="delete-mode-btn" type="button">${deleteModeGroups.has(group)?'Готово':'Удалить'}</button></div><div class="collapse-content"></div>`;
       wrap.querySelector('.add-item-btn').addEventListener('click',e=>{e.stopPropagation();openAddItemSheet(group)});
       const content=wrap.querySelector('.collapse-content');
@@ -739,7 +744,7 @@ function renderShopping(){
         const row=document.createElement('div');row.className='item'+(checked?' done':'');
         if(deleteModeGroups.has(group)){
           row.innerHTML=`<button class="delete-item-btn" type="button" aria-label="Удалить">−</button><label>${item}</label>`;
-          row.querySelector('.delete-item-btn').addEventListener('click',()=>{shopping[group]=shopping[group].filter(x=>x!==item);if(customItems[group]){customItems[group]=customItems[group].filter(x=>x!==item);if(!customItems[group].length)delete customItems[group];localStorage.setItem(customItemsKey,JSON.stringify(customItems))}delete saved[id];localStorage.setItem(key,JSON.stringify(saved));recipeAdded=recipeAdded.filter(x=>x!==item);localStorage.setItem(recipeAddedKey,JSON.stringify(recipeAdded));renderShopping();renderToday()});
+          row.querySelector('.delete-item-btn').addEventListener('click',()=>{shopping[group]=shopping[group].filter(x=>x!==item);if(!deletedItems.includes(id)){deletedItems.push(id);localStorage.setItem(deletedItemsKey,JSON.stringify(deletedItems))}if(customItems[group]){customItems[group]=customItems[group].filter(x=>x!==item);if(!customItems[group].length)delete customItems[group];localStorage.setItem(customItemsKey,JSON.stringify(customItems))}delete saved[id];localStorage.setItem(key,JSON.stringify(saved));recipeAdded=recipeAdded.filter(x=>x!==item);localStorage.setItem(recipeAddedKey,JSON.stringify(recipeAdded));renderShopping();renderToday()});
         }else{
           row.innerHTML=`<input type="checkbox" id="${id}" ${checked?'checked':''}><label for="${id}">${item}</label>`;
           row.querySelector('input').addEventListener('change',e=>setShopState(group,item,e.target.checked));
