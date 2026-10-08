@@ -110,7 +110,7 @@ h1{font-size:30px;line-height:1.05;margin:0;letter-spacing:-.02em}
         <button class="chip" data-shopfilter="done">Куплено</button>
       </div>
       <div class="steps" style="margin-top:12px">
-        <div class="step"><b>Ближайшее:</b> <span id="activeShopCount">0</span> вещей</div>
+        <div class="step"><b>Осталось купить:</b> <span id="activeShopCount">0</span> вещей</div>
         <div class="step"><b>Продукты:</b> обычные отдельно, рамен — в сворачиваемом списке</div>
       </div>
     </div>
@@ -803,14 +803,15 @@ function renderShopping(){
         content.appendChild(row);
       });
       if(!visible) return;
-      if(group==='Плановые покупки по надобности' || group==='Куплено / уже есть' || group==='Продукты — рамен') content.classList.add('hidden');
+      if(group!=='Срочно купить') content.classList.add('hidden');
       wrap.querySelector('.collapse-btn').addEventListener('click',()=>content.classList.toggle('hidden'));
       root.appendChild(wrap);
     });
   }
   let activeCount=0;
-  shopping['Купить в ближайшее время'].forEach(item=>{
-    const id=itemId('Купить в ближайшее время',item); const checked=saved[id] ?? false; if(!checked) activeCount++;
+  Object.entries(shopping).forEach(([group,items])=>{
+    if(group==='Куплено / уже есть')return;
+    items.forEach(item=>{if(!(saved[itemId(group,item)] ?? false))activeCount++});
   });
   const counter=document.getElementById('activeShopCount'); if(counter) counter.textContent=activeCount;
 }
