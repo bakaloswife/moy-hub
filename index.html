@@ -1013,7 +1013,25 @@ document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=
 
 renderShopping();renderCareBlock('careMe',careMe);renderCareBlock('careNikita',careNikita);renderWorkouts();renderToday();renderReviewStats();
 </script>
-<script src="home-dashboard.js?v=4"></script>
+<script src="home-dashboard.js?v=5"></script>
+<script>
+/* Enforce dashboard block order independently of cached dashboard code. */
+(function(){
+  function arrangeHome(){
+    const layout=document.querySelector('#home .home-layout');
+    if(!layout)return;
+    const find=id=>document.getElementById(id)?.closest('.home-panel');
+    const reminders=find('homeRemindersList');
+    const notes=find('homeNotesList');
+    const urgent=find('homeUrgentItems') || find('homeUrgentList');
+    if(reminders&&notes&&urgent){
+      layout.append(reminders,notes,urgent);
+    }
+  }
+  arrangeHome();
+  document.addEventListener('DOMContentLoaded',arrangeHome,{once:true});
+})();
+</script>
 </body>
 </html>
 
