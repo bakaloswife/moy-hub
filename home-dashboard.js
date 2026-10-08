@@ -48,12 +48,14 @@ const front=make('span','home-czech-word'),meaning=make('span','home-czech-meani
 const hint=make('span','small','Нажми, чтобы увидеть перевод');card.append(front,meaning,hint);cz.append(card);
 const czBottom=make('div','home-card-bottom');czBottom.append(make('span','small','Из твоего словаря'));
 const nextWord=make('button','chip','Другое слово ↻');nextWord.type='button';czBottom.append(nextWord);cz.append(czBottom);
-const remindersPanel=panel('🔔 Ежедневные напоминания',false);
-remindersPanel.append(make('p','home-muted','Галочки обновляются каждый день. Это чек-лист, а не push-уведомления.'));
+const remindersPanel=panel('🕒 План на день',true);
+remindersPanel.append(make('p','home-muted','Расписание из твоего плана Timo. Без галочек и отметок выполнения. Время и дела можно изменить.'));
 const remindersList=make('div','home-list');remindersPanel.append(remindersList);
 const remLine=make('div','home-add-line');
-const remInput=make('input','home-field');remInput.placeholder='Добавить ежедневное дело';
-const remAdd=make('button','chip','Добавить');remAdd.type='button';remLine.append(remInput,remAdd);remindersPanel.append(remLine);
+const remTime=make('input','home-field');remTime.type='time';remTime.value='17:00';remTime.style.maxWidth='115px';remTime.setAttribute('aria-label','Время дела');
+const remInput=make('input','home-field');remInput.placeholder='Новое дело';
+const remAdd=make('button','chip','+');remAdd.type='button';remAdd.setAttribute('aria-label','Добавить дело');
+remLine.append(remTime,remInput,remAdd);remindersPanel.append(remLine);
 const notesPanel=panel('📝 Заметки',false);
 const draft=make('textarea','home-field');draft.rows=3;draft.placeholder='Записать мысль…';notesPanel.append(draft);
 const addNote=make('button','chip home-action','Сохранить заметку +');addNote.type='button';notesPanel.append(addNote);
@@ -87,21 +89,36 @@ row.append(txt,del);notesList.append(row);
 addNote.addEventListener('click',()=>{const value=draft.value.trim();if(!value)return;notes.unshift({text:value,date:new Date().toISOString()});store(notesKey,notes);draft.value='';try{localStorage.removeItem(draftKey)}catch(e){}drawNotes()});
 drawNotes();
 const remindersKey='myhub-home-reminders-v1';
-let reminders=read(remindersKey);if(!Array.isArray(reminders))reminders=[];
+const defaultSchedule=[
+{time:'07:00',text:'Работа — первый блок'},
+{time:'08:00',text:'Проверить Timo'},
+{time:'12:00',text:'Работа / короткий перерыв'},
+{time:'13:00',text:'Обед и отдых до 14:00'},
+{time:'14:00',text:'Проверить Timo'},
+{time:'14:05',text:'Работа — второй блок до 16:00'},
+{time:'16:00',text:'Отдых после работы'},
+{time:'22:00',text:'Проверить Timo'}
+];
+let reminders=read(remindersKey);
+if(!Array.isArray(reminders))reminders=defaultSchedule.map(entry=>({...entry}));
+else reminders=reminders.map(entry=>({time:entry.time||'',text:String(entry.text||'')}));
+store(remindersKey,reminders);
 function drawReminders(){
 remindersList.replaceChildren();
-if(!reminders.length)remindersList.append(make('div','home-empty','Добавь ежедневное дело ниже'));
-reminders.forEach((reminder,i)=>{
+if(!reminders.length)remindersList.append(make('div','home-empty','Добавь дело с временем ниже'));
+const sorted=reminders.map((entry,index)=>({...entry,index})).sort((a,b)=>a.time.localeCompare(b.time));
+sorted.forEach(reminder=>{
 const row=make('div','home-row');
-const checked=make('input');checked.type='checkbox';checked.checked=reminder.lastDone===dayKey();
-const txt=make('span','home-row-text',reminder.text);if(checked.checked)txt.classList.add('home-row-done');
-checked.addEventListener('change',()=>{reminder.lastDone=checked.checked?dayKey():null;txt.classList.toggle('home-row-done',checked.checked);store(remindersKey,reminders)});
+const time=make('input','home-field');time.type='time';time.value=reminder.time||'';time.style.width='105px';time.style.padding='7px';time.style.flex='0 0 auto';time.setAttribute('aria-label','Изменить время');
+time.addEventListener('change',()=>{reminders[reminder.index].time=time.value;store(remindersKey,reminders);drawReminders()});
+const txt=make('span','home-row-text',reminder.text);txt.contentEditable='true';txt.setAttribute('role','textbox');txt.setAttribute('tabindex','0');txt.setAttribute('aria-label','Изменить дело');
+txt.addEventListener('input',()=>{reminders[reminder.index].text=txt.textContent;store(remindersKey,reminders)});
 const del=make('button','home-remove','×');del.type='button';del.setAttribute('aria-label','Удалить дело');
-del.addEventListener('click',()=>{reminders.splice(i,1);store(remindersKey,reminders);drawReminders()});
-row.append(checked,txt,del);remindersList.append(row);
+del.addEventListener('click',()=>{reminders.splice(reminder.index,1);store(remindersKey,reminders);drawReminders()});
+row.append(time,txt,del);remindersList.append(row);
 });
 }
-function addReminder(){const value=remInput.value.trim();if(!value)return;reminders.push({text:value,lastDone:null});store(remindersKey,reminders);remInput.value='';drawReminders()}
+function addReminder(){const value=remInput.value.trim();if(!value)return;reminders.push({time:remTime.value,text:value});store(remindersKey,reminders);remInput.value='';drawReminders()}
 remAdd.addEventListener('click',addReminder);
 remInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addReminder()}});
 drawReminders();
