@@ -721,6 +721,17 @@ oldShoppingGroups.forEach(group=>(shopping[group]||[]).forEach(item=>{
 }));
 Object.keys(shopping).forEach(group=>delete shopping[group]);
 Object.assign(shopping,regrouped);
+/* Include items previously added directly to the new thematic categories. */
+categoryNames.forEach(group=>{
+  const manual=customItems[group];
+  if(!Array.isArray(manual))return;
+  manual.forEach(item=>{
+    if(typeof item==='string'&&!deletedItems.includes(itemId(group,item))&&!shopping[group].includes(item)){
+      shopping[group].push(item);
+    }
+  });
+});
+
 /* Migrate manually added items so subsequent additions and deletions stay consistent. */
 oldShoppingGroups.forEach(group=>{
   const manual=customItems[group];
