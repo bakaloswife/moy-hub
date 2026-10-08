@@ -100,9 +100,16 @@ const defaultSchedule=[
 {time:'22:00',text:'Проверить Timo'}
 ];
 let reminders=read(remindersKey);
-if(!Array.isArray(reminders))reminders=defaultSchedule.map(entry=>({...entry}));
-else reminders=reminders.map(entry=>({time:entry.time||'',text:String(entry.text||'')}));
+const scheduleMigrationKey='myhub-home-schedule-initialized-v1';
+let migrationDone=false;
+try{migrationDone=localStorage.getItem(scheduleMigrationKey)==='1'}catch(e){}
+if(!migrationDone && (!Array.isArray(reminders)||reminders.length===0)){
+  reminders=defaultSchedule.map(entry=>({...entry}));
+}
+if(!Array.isArray(reminders))reminders=[];
+reminders=reminders.map(entry=>({time:entry.time||'',text:String(entry.text||'')}));
 store(remindersKey,reminders);
+try{localStorage.setItem(scheduleMigrationKey,'1')}catch(e){}
 function drawReminders(){
 remindersList.replaceChildren();
 if(!reminders.length)remindersList.append(make('div','home-empty','Добавь дело с временем ниже'));
