@@ -792,7 +792,7 @@ function renderShopping(){
       if(group==='Куплено / уже есть' && shopFilter==='open') return;
       const wrap=document.createElement('div');wrap.className='card';
       const badge=group==='Срочно купить'?'<span class="badge now">срочно</span>':group==='Купить в ближайшее время'?'<span class="badge now">сейчас</span>':group==='Плановые покупки по надобности'?'<span class="badge later">планово</span>':'';
-      wrap.innerHTML=`<div class="group-head"><button class="collapse-btn"><h3>${group}${badge}</h3><span>⌄</span></button><button class="add-item-btn" type="button">+ Добавить</button><button class="delete-mode-btn" type="button">${deleteModeGroups.has(group)?'Готово':'Удалить'}</button></div><div class="collapse-content"></div>`;
+      wrap.innerHTML=`<div class="group-head"><button class="collapse-btn"><h3>${group==='Продукты — обычные'?'Продукты':group}${badge}</h3><span>⌄</span></button><button class="add-item-btn" type="button">+ Добавить</button><button class="delete-mode-btn" type="button">${deleteModeGroups.has(group)?'Готово':'Удалить'}</button></div><div class="collapse-content"></div>`;
       wrap.querySelector('.add-item-btn').addEventListener('click',e=>{e.stopPropagation();openAddItemSheet(group)});
       const content=wrap.querySelector('.collapse-content');
       wrap.querySelector('.delete-mode-btn').addEventListener('click',e=>{e.stopPropagation();if(deleteModeGroups.has(group))deleteModeGroups.delete(group);else deleteModeGroups.add(group);renderShopping()});
