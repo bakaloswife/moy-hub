@@ -720,6 +720,14 @@ oldShoppingGroups.forEach(group=>(shopping[group]||[]).forEach(item=>{
 }));
 Object.keys(shopping).forEach(group=>delete shopping[group]);
 Object.assign(shopping,regrouped);
+/* Defensive cleanup: old ramen category must never appear as a separate panel. */
+if(shopping['Продукты — рамен']){
+  shopping['Продукты — рамен'].forEach(item=>{
+    if(!shopping['Продукты — обычные'].includes(item))shopping['Продукты — обычные'].push(item);
+  });
+  delete shopping['Продукты — рамен'];
+}
+
 /* Include items previously added directly to the new thematic categories. */
 categoryNames.forEach(group=>{
   const manual=customItems[group];
@@ -789,6 +797,7 @@ function renderShopping(){
     renderDoneOnly(root,term);
   }else{
     Object.entries(shopping).forEach(([group,items])=>{
+      if(group==='Продукты — рамен') return;
       if(group==='Куплено / уже есть' && shopFilter==='open') return;
       const wrap=document.createElement('div');wrap.className='card';
       const badge=group==='Срочно купить'?'<span class="badge now">срочно</span>':group==='Купить в ближайшее время'?'<span class="badge now">сейчас</span>':group==='Плановые покупки по надобности'?'<span class="badge later">планово</span>':'';
