@@ -687,6 +687,54 @@ const customItemsKey='myhub-shopping-custom-v1';
 let customItems={};try{customItems=JSON.parse(localStorage.getItem(customItemsKey)||'{}')}catch(e){customItems={}}
 Object.entries(customItems).forEach(([group,items])=>{if(shopping[group]&&Array.isArray(items))items.forEach(item=>{if(typeof item==='string'&&!shopping[group].includes(item))shopping[group].push(item)})});
 Object.keys(shopping).forEach(group=>{shopping[group]=shopping[group].filter(item=>!deletedItems.includes(itemId(group,item)))});
+
+/* Shopping category reorganization. Move items by name, keeping stable IDs and deletions. */
+const shopCategoryVersion='myhub-shopping-categories-v2';
+const categoryNames=['Косметика и уход','Электроника','Одежда','Дом','Продукты — обычные','Продукты — рамен'];
+const categoryKeywords={
+ 'Косметика и уход':['Pilník na nehty','Kleštičky na řasy','Magnetické řasy','essence ','Hnědá tužka','Řasenka se','Průhledná růžová','UV lampa','The Ordinary','La Roche-Posay','Fén s difuzérem','Holicí strojek','Denní slipové vložky'],
+ 'Электроника':['USB-C nabíječka','Superlux','Hodinky Huawei','Micro-USB kabel','Digitální fotoaparát','Malá powerbanka'],
+ 'Одежда':['Černý svetr','Hezké šaty','Pyžamo','Noční košile','Teplá velká domácí mikina','Teplé domácí bačkory'],
+ 'Дом':['Struhadlo','Kelímek','Botník','Náhradní návlek','Tuhé mýdlo']
+};
+function categoryForItem(item,formerGroup){
+  for(const [category,prefixes] of Object.entries(categoryKeywords)){
+    if(prefixes.some(prefix=>item.startsWith(prefix)))return category;
+  }
+  if(formerGroup==='Продукты — обычные'||formerGroup==='Продукты — рамен')return formerGroup;
+  return formerGroup==='Плановые покупки по надобности'?'Дом':formerGroup==='Купить в ближайшее время'?'Дом':formerGroup;
+}
+const regrouped={
+ 'Срочно купить':[...(shopping['Срочно купить']||[])],
+ 'Косметика и уход':[],
+ 'Электроника':[],
+ 'Одежда':[],
+ 'Дом':[],
+ 'Продукты — обычные':[],
+ 'Продукты — рамен':[],
+ 'Куплено / уже есть':[...(shopping['Куплено / уже есть']||[])]
+};
+const oldShoppingGroups=['Купить в ближайшее время','Плановые покупки по надобности','Продукты — обычные','Продукты — рамен'];
+oldShoppingGroups.forEach(group=>(shopping[group]||[]).forEach(item=>{
+  const destination=categoryForItem(item,group);
+  if(regrouped[destination]&&!regrouped[destination].includes(item))regrouped[destination].push(item);
+}));
+Object.keys(shopping).forEach(group=>delete shopping[group]);
+Object.assign(shopping,regrouped);
+/* Migrate manually added items so subsequent additions and deletions stay consistent. */
+oldShoppingGroups.forEach(group=>{
+  const manual=customItems[group];
+  if(!Array.isArray(manual))return;
+  manual.forEach(item=>{
+    const destination=categoryForItem(item,group);
+    if(!shopping[destination])return;
+    customItems[destination]=customItems[destination]||[];
+    if(!customItems[destination].includes(item))customItems[destination].push(item);
+  });
+  if(group==='Купить в ближайшее время'||group==='Плановые покупки по надобности')delete customItems[group];
+});
+localStorage.setItem(customItemsKey,JSON.stringify(customItems));
+
 function setFilterButton(filter){
   document.querySelectorAll('[data-shopfilter]').forEach(x=>x.classList.toggle('active',x.dataset.shopfilter===filter));
 }
