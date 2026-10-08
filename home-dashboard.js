@@ -6,6 +6,13 @@ if(!root||typeof workouts==='undefined'||typeof careMe==='undefined'||typeof cze
 const make=(tag,cls,text)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el};
 const store=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value))}catch(e){console.warn('Unable to store data',e)}};
 const read=(key)=>{try{return JSON.parse(localStorage.getItem(key)||'null')}catch(e){return null}};
+const playlists={
+  stretching:{name:'Стретчинг',url:'https://youtube.com/playlist?list=PLKandqretRBY&si=A1HoLVZjWWn9Cl9d'},
+  mobility:{name:'Мобилити',url:'https://youtube.com/playlist?list=PLVV4y7K6QDmM&si=blP4zf8WDnGvAM0f'},
+  core:{name:'Кор',url:'https://youtube.com/playlist?list=PLP1yXZ0Auviw&si=bR5hWxYEidRO8mJg'},
+  workout:{name:'Воркаут',url:'https://youtube.com/playlist?list=PLD9H_zziCmVenSg0enNjSvJnxQ9qTFPzf&si=_0WW1MqbGwxBwu7k'}
+};
+const playlistDays={0:'stretching',1:'workout',2:'core',3:'mobility',4:'stretching',5:'workout',6:'core'};
 const dayKey=()=>{const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')};
 function panel(label,open=true){
 const details=make('details','home-panel');details.open=open;
@@ -21,8 +28,16 @@ container.append(button);
 root.replaceChildren();root.append(make('div','home-layout'));
 const training=panel('🏋️ Тренировка сегодня');
 const workoutTitle=make('div','home-title'),workoutSub=make('div','home-muted');
-const video=make('a','video hidden','Открыть видео ↗');video.target='_blank';video.rel='noopener noreferrer';
-training.append(workoutTitle,workoutSub,video);go('workouts',training,'Все тренировки →');
+const video=make('a','video','Открыть плейлист ↗');video.target='_blank';video.rel='noopener noreferrer';
+training.append(workoutTitle,workoutSub,video);
+const playlistShortcuts=make('div','home-card-bottom');
+playlistShortcuts.style.flexWrap='wrap';
+for(const key of ['stretching','mobility','core','workout']){
+  const p=playlists[key];const link=make('a','chip',p.name);link.href=p.url;link.target='_blank';link.rel='noopener noreferrer';link.style.textDecoration='none';
+  playlistShortcuts.append(link);
+}
+training.append(playlistShortcuts);
+go('workouts',training,'Все тренировки →');
 const care=panel('🌙 Вечернее умывание');
 const careText=make('div','step');care.append(careText);go('care',care,'Весь уход →');
 const cz=panel('🇨🇿 Чешская карточка');
@@ -90,9 +105,11 @@ remInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();a
 drawReminders();
 function refresh(){
 const now=new Date(),d=now.getDay(),w=workouts[d],careDay=careMe[d];
-workoutTitle.textContent=w.title;workoutSub.textContent=[w.video,w.dur].filter(Boolean).join(' · ');
-video.classList.toggle('hidden',!w.url);
-if(w.url)video.href=w.url;else video.removeAttribute('href');
+workoutTitle.textContent=w.title;
+const dayPlaylist=playlists[playlistDays[d]];
+workoutSub.textContent=d===0?'Восстановление · стретчинг по желанию':(w.dur||'Выбери видео в плейлисте');
+video.href=dayPlaylist.url;
+video.textContent='▶ Открыть плейлист «'+dayPlaylist.name+'» ↗';
 careText.textContent=careDay[1].replace(/^Вечер:\s*/,'');
 urgentList.replaceChildren();
 const group='Срочно купить',items=(shopping[group]||[]).filter(item=>!deletedItems.includes(itemId(group,item))&&!(saved[itemId(group,item)]??false));
@@ -105,6 +122,26 @@ check.addEventListener('change',()=>{setShopState(group,item,check.checked,false
 urgentList.append(row);
 });
 }
+function replaceWorkoutVideos(){
+  const daysRoot=document.getElementById('workoutDays');
+  if(!daysRoot)return;
+  const dayOrder=[1,2,3,4,5,6,0];
+  [...daysRoot.querySelectorAll(':scope > .day')].forEach((dayElement,index)=>{
+    const d=dayOrder[index],playlist=playlists[playlistDays[d]];
+    if(!playlist)return;
+    const oldVideo=dayElement.querySelector('.video');
+    const link=make('a','video');
+    link.href=playlist.url;link.target='_blank';link.rel='noopener noreferrer';
+    link.append(make('div','video-title','▶ '+playlist.name+' — плейлист YouTube'));
+    link.append(make('div','video-link',d===0?'Открыть по желанию ↗':'Выбрать тренировку ↗'));
+    if(oldVideo)oldVideo.replaceWith(link);
+    else {
+      const note=dayElement.querySelector('.note');
+      if(note)dayElement.insertBefore(link,note);else dayElement.append(link);
+    }
+  });
+}
+replaceWorkoutVideos();
 renderToday=refresh;
 refresh();
 })();
