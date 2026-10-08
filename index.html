@@ -1020,10 +1020,11 @@ renderShopping();renderCareBlock('careMe',careMe);renderCareBlock('careNikita',c
   function arrangeHome(){
     const layout=document.querySelector('#home .home-layout');
     if(!layout)return;
-    const find=id=>document.getElementById(id)?.closest('.home-panel');
-    const reminders=find('homeRemindersList');
-    const notes=find('homeNotesList');
-    const urgent=find('homeUrgentItems') || find('homeUrgentList');
+    const panels=[...layout.querySelectorAll(':scope > .home-panel')];
+    const find=label=>panels.find(panel=>panel.querySelector('summary')?.textContent.includes(label));
+    const reminders=find('Ежедневные напоминания');
+    const notes=find('Заметки');
+    const urgent=find('Срочно купить');
     if(reminders&&notes&&urgent){
       layout.append(reminders,notes,urgent);
     }
