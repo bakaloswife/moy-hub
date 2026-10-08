@@ -890,7 +890,7 @@ function renderWorkouts(){const root=document.getElementById('workoutDays');root
 
 function renderToday(){
  const d=now.getDay(); const w=workouts[d];
- let nearest=[]; shopping['Купить в ближайшее время'].forEach(item=>{const id=itemId('Купить в ближайшее время',item);const checked=saved[id]??false;if(!checked)nearest.push(item)});
+ let nearest=[]; (shopping['Срочно купить']||[]).forEach(item=>{const id=itemId('Срочно купить',item);const checked=saved[id]??false;if(!checked)nearest.push(item)});
  const c=careMe[d];
  const preview=nearest.slice(0,4).map(x=>`• ${x}`).join('<br>');
  const more=nearest.length>4?`<div class="small" style="margin-top:6px">+ ещё ${nearest.length-4}</div>`:'';
