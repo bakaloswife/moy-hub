@@ -111,7 +111,7 @@ h1{font-size:30px;line-height:1.05;margin:0;letter-spacing:-.02em}
       </div>
       <div class="steps" style="margin-top:12px">
         <div class="step"><b>Осталось купить:</b> <span id="activeShopCount">0</span> вещей</div>
-        <div class="step"><b>Продукты:</b> обычные отдельно, рамен — в сворачиваемом списке</div>
+        <div class="step"><b>Продукты:</b> общий список, включая ингредиенты для рецептов</div>
       </div>
     </div>
     <div id="shoppingGroups"></div>
@@ -690,7 +690,7 @@ Object.keys(shopping).forEach(group=>{shopping[group]=shopping[group].filter(ite
 
 /* Shopping category reorganization. Move items by name, keeping stable IDs and deletions. */
 const shopCategoryVersion='myhub-shopping-categories-v2';
-const categoryNames=['Косметика и уход','Электроника','Одежда','Дом','Продукты — обычные','Продукты — рамен'];
+const categoryNames=['Косметика и уход','Электроника','Одежда','Дом','Продукты — обычные'];
 const categoryKeywords={
  'Косметика и уход':['Pilník na nehty','Kleštičky na řasy','Magnetické řasy','essence ','Hnědá tužka','Řasenka se','Průhledná růžová','UV lampa','The Ordinary','La Roche-Posay','Fén s difuzérem','Holicí strojek','Denní slipové vložky'],
  'Электроника':['USB-C nabíječka','Superlux','Hodinky Huawei','Micro-USB kabel','Digitální fotoaparát','Malá powerbanka'],
@@ -701,13 +701,12 @@ function categoryForItem(item,formerGroup){
   for(const [category,prefixes] of Object.entries(categoryKeywords)){
     if(prefixes.some(prefix=>item.startsWith(prefix)))return category;
   }
-  if(formerGroup==='Продукты — обычные'||formerGroup==='Продукты — рамен')return formerGroup;
+  if(formerGroup==='Продукты — обычные'||formerGroup==='Продукты — рамен')return 'Продукты — обычные';
   return formerGroup==='Плановые покупки по надобности'?'Дом':formerGroup==='Купить в ближайшее время'?'Дом':formerGroup;
 }
 const regrouped={
  'Срочно купить':[...(shopping['Срочно купить']||[])],
  'Продукты — обычные':[],
- 'Продукты — рамен':[],
  'Косметика и уход':[],
  'Электроника':[],
  'Одежда':[],
@@ -742,7 +741,7 @@ oldShoppingGroups.forEach(group=>{
     customItems[destination]=customItems[destination]||[];
     if(!customItems[destination].includes(item))customItems[destination].push(item);
   });
-  if(group==='Купить в ближайшее время'||group==='Плановые покупки по надобности')delete customItems[group];
+  if(group==='Купить в ближайшее время'||group==='Плановые покупки по надобности'||group==='Продукты — рамен')delete customItems[group];
 });
 localStorage.setItem(customItemsKey,JSON.stringify(customItems));
 
@@ -1079,7 +1078,7 @@ renderShopping();renderCareBlock('careMe',careMe);renderCareBlock('careNikita',c
 <script>
 /* Explicit shopping panel order independent of category/object insertion order. */
 (function(){
-  const desired=['Срочно купить','Продукты — обычные','Продукты — рамен','Косметика и уход','Электроника','Одежда','Дом','Куплено / уже есть'];
+  const desired=['Срочно купить','Продукты — обычные','Косметика и уход','Электроника','Одежда','Дом','Куплено / уже есть'];
   const root=document.getElementById('shoppingGroups');
   function sortShopping(){
     if(!root)return;
