@@ -1077,6 +1077,23 @@ renderShopping();renderCareBlock('careMe',careMe);renderCareBlock('careNikita',c
 </script>
 <script src="home-dashboard.js?v=7"></script>
 <script>
+/* Explicit shopping panel order independent of category/object insertion order. */
+(function(){
+  const desired=['Срочно купить','Продукты — обычные','Продукты — рамен','Косметика и уход','Электроника','Одежда','Дом','Куплено / уже есть'];
+  const root=document.getElementById('shoppingGroups');
+  function sortShopping(){
+    if(!root)return;
+    const cards=[...root.children];
+    const groupOf=el=>el.querySelector('.group-head h3')?.textContent?.trim()||'';
+    const rank=el=>{const label=groupOf(el);const ix=desired.findIndex(name=>label.startsWith(name));return ix<0?999:ix};
+    cards.sort((a,b)=>rank(a)-rank(b)).forEach(card=>root.appendChild(card));
+  }
+  sortShopping();
+  if(root){
+    const watcher=new MutationObserver(()=>{const current=[...root.children];const ranks=current.map(el=>{const i=desired.findIndex(name=>(el.querySelector('.group-head h3')?.textContent||'').trim().startsWith(name));return i<0?999:i});if(ranks.some((n,i)=>i>0&&n<ranks[i-1]))sortShopping()});
+    watcher.observe(root,{childList:true});
+  }
+})();
 /* Enforce dashboard block order independently of cached dashboard code. */
 (function(){
   function arrangeHome(){
