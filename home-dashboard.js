@@ -63,13 +63,42 @@ const notesList=make('div','home-list');notesPanel.append(notesList);
 const urgent=panel('🛒 Срочно купить');
 const urgentList=make('div','home-list');urgent.append(urgentList);go('shopping',urgent,'Все покупки →');
 let wordIndex=0,revealed=false;
-const today=new Date();const dayNumber=Math.floor(Date.UTC(today.getFullYear(),today.getMonth(),today.getDate())/86400000);
-const difficult=czechWords.filter(w=>typeof wordReviewState==='function'&&(wordReviewState(w.cz).hard||0)>0);
-const pool=difficult.length&&dayNumber%2===0?difficult:czechWords;
-if(pool.length)wordIndex=czechWords.indexOf(pool[(dayNumber%pool.length+pool.length)%pool.length]);
+const czechRotationKey='myhub-home-czech-rotation-v1';
+const shuffleWords=items=>{
+  const list=[...items];
+  for(let i=list.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [list[i],list[j]]=[list[j],list[i]];
+  }
+  return list;
+};
+function nextCzechWord(){
+  if(!czechWords.length)return;
+  const keys=[...new Set(czechWords.map(w=>w.cz))];
+  const saved=read(czechRotationKey);
+  const previous=typeof saved?.last==='string'?saved.last:null;
+  let remaining=Array.isArray(saved?.remaining)?saved.remaining.filter((key,i,arr)=>keys.includes(key)&&arr.indexOf(key)===i):[];
+  const newKeys=keys.filter(key=>key!==previous&&!remaining.includes(key));
+  if(remaining.length){
+    // Newly added vocabulary joins the current cycle without losing progress.
+    remaining=shuffleWords([...remaining,...newKeys]);
+  }else{
+    remaining=shuffleWords(keys);
+  }
+  if(remaining.length>1&&remaining[remaining.length-1]===previous){
+    const j=remaining.findIndex(key=>key!==previous);
+    [remaining[j],remaining[remaining.length-1]]=[remaining[remaining.length-1],remaining[j]];
+  }
+  const chosen=remaining.pop();
+  wordIndex=czechWords.findIndex(w=>w.cz===chosen);
+  store(czechRotationKey,{remaining,last:chosen});
+  revealed=false;
+  paintWord();
+}
 function paintWord(){const w=czechWords[wordIndex];if(!w)return;front.textContent=w.cz;meaning.textContent=revealed?[w.ru,w.note].filter(Boolean).join(' · '):'';hint.textContent=revealed?'Нажми, чтобы скрыть перевод':'Нажми, чтобы увидеть перевод';card.setAttribute('aria-label',revealed?'Скрыть перевод':'Показать перевод')}
 card.addEventListener('click',()=>{revealed=!revealed;paintWord()});
-nextWord.addEventListener('click',()=>{wordIndex=(wordIndex+1)%czechWords.length;revealed=false;paintWord()});paintWord();
+nextWord.addEventListener('click',nextCzechWord);
+nextCzechWord();
 const notesKey='myhub-home-notes-v1',draftKey='myhub-home-note-draft-v1';
 let notes=read(notesKey);if(!Array.isArray(notes))notes=[];
 try{draft.value=localStorage.getItem(draftKey)||''}catch(e){}
