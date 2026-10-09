@@ -1083,7 +1083,7 @@ document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=
 
 renderShopping();renderCareBlock('careMe',careMe);renderCareBlock('careNikita',careNikita);renderWorkouts();renderToday();renderReviewStats();
 </script>
-<script src="home-dashboard.js?v=8"></script>
+<script src="home-dashboard.js?v=9"></script>
 <script>
 /* Explicit shopping panel order independent of category/object insertion order. */
 (function(){
@@ -1109,7 +1109,7 @@ renderShopping();renderCareBlock('careMe',careMe);renderCareBlock('careNikita',c
     if(!layout)return;
     const panels=[...layout.querySelectorAll(':scope > .home-panel')];
     const find=label=>panels.find(panel=>panel.querySelector('summary')?.textContent.includes(label));
-    const reminders=find('План на день');
+    const reminders=find('Дневной план');
     const notes=find('Заметки');
     const urgent=find('Срочно купить');
     if(reminders&&notes&&urgent){
