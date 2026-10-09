@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <title>Мой хаб</title>
+<meta name="hub-build" content="groceries-cs-v11">
 <style>
 :root{
   --bg:#0D0F14;
@@ -778,7 +779,7 @@ function allShoppingRows(){
 }
 // Display groceries in Czech while preserving the original item IDs and stored states.
 function shoppingDisplayName(group,item){
-  return group.startsWith('Продукты') ? item.replace(/\s*\([^()]*[А-Яа-яЁё][^()]*\)\s*$/u,'').trim() : item;
+  return group.startsWith('Продукты') ? item.replace(/\s*\([^()]*[А-Яа-яЁё][^()]*\)/gu,'').trim() : item;
 }
 function renderDoneOnly(root,term){
   const done=allShoppingRows().filter(x=>x.checked && (!term || x.item.toLowerCase().includes(term)));
