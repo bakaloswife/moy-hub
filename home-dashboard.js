@@ -48,14 +48,22 @@ const front=make('span','home-czech-word'),meaning=make('span','home-czech-meani
 const hint=make('span','small','Нажми, чтобы увидеть перевод');card.append(front,meaning,hint);cz.append(card);
 const czBottom=make('div','home-card-bottom');czBottom.append(make('span','small','Из твоего словаря'));
 const nextWord=make('button','chip','Другое слово ↻');nextWord.type='button';czBottom.append(nextWord);cz.append(czBottom);
-const remindersPanel=panel('🕒 План на день',true);
-remindersPanel.append(make('p','home-muted','Расписание из твоего плана Timo. Без галочек и отметок выполнения. Время и дела можно изменить.'));
-const remindersList=make('div','home-list');remindersPanel.append(remindersList);
-const remLine=make('div','home-add-line');
-const remTime=make('input','home-field');remTime.type='time';remTime.value='17:00';remTime.style.maxWidth='115px';remTime.setAttribute('aria-label','Время дела');
-const remInput=make('input','home-field');remInput.placeholder='Новое дело';
-const remAdd=make('button','chip','+');remAdd.type='button';remAdd.setAttribute('aria-label','Добавить дело');
-remLine.append(remTime,remInput,remAdd);remindersPanel.append(remLine);
+const dayPlanPanel=panel('🗓️ Дневной план',true);
+const dayPlanMorning=make('div','');const dayPlanEvening=make('div','');const dayPlanLoose=make('div','');
+const planTimer=make('div','');
+planTimer.style.cssText='background:var(--card2);border-radius:16px;padding:13px;margin:10px 0;display:grid;gap:10px';
+const planAddButton=make('button','chip home-action','+ Добавить план');
+planAddButton.type='button';
+const planForm=make('div','');planForm.hidden=true;planForm.style.cssText='display:none;background:var(--card2);padding:12px;border-radius:14px;margin-top:10px';
+const planName=make('input','home-field');planName.placeholder='Что запланировано?';planName.setAttribute('aria-label','Название плана');
+const planTime=make('input','home-field');planTime.type='time';planTime.setAttribute('aria-label','Время, необязательно');
+const planDate=make('input','home-field');planDate.type='date';planDate.setAttribute('aria-label','Дата, необязательно');
+const planSave=make('button','chip','Сохранить');planSave.type='button';
+const planCancel=make('button','chip','Отмена');planCancel.type='button';
+const planInputs=make('div','home-add-line');planInputs.append(planTime,planDate);
+const planButtons=make('div','home-add-line');planButtons.append(planSave,planCancel);
+planForm.append(planName,planInputs,make('div','home-muted','Время и дата необязательны. Без времени дело появится в «Планах». Уведомления не отправляются.'),planButtons);
+dayPlanPanel.append(dayPlanMorning,planTimer,dayPlanEvening,dayPlanLoose,planAddButton,planForm);
 const notesPanel=panel('📝 Заметки',false);
 const draft=make('textarea','home-field');draft.rows=3;draft.placeholder='Записать мысль…';notesPanel.append(draft);
 const addNote=make('button','chip home-action','Сохранить заметку +');addNote.type='button';notesPanel.append(addNote);
@@ -118,47 +126,93 @@ row.append(txt,del);notesList.append(row);
 }
 addNote.addEventListener('click',()=>{const value=draft.value.trim();if(!value)return;notes.unshift({text:value,date:new Date().toISOString()});store(notesKey,notes);draft.value='';try{localStorage.removeItem(draftKey)}catch(e){}drawNotes()});
 drawNotes();
-const remindersKey='myhub-home-reminders-v1';
-const defaultSchedule=[
-{time:'07:00',text:'Работа — первый блок'},
-{time:'08:00',text:'Проверить Timo'},
-{time:'12:00',text:'Работа / короткий перерыв'},
-{time:'13:00',text:'Обед и отдых до 14:00'},
-{time:'14:00',text:'Проверить Timo'},
-{time:'14:05',text:'Работа — второй блок до 16:00'},
-{time:'16:00',text:'Отдых после работы'},
-{time:'22:00',text:'Проверить Timo'}
+const planKey='myhub-day-plan-v1';
+const routineMorning=[
+  ['💧','Умыться'],['💊','Принять таблетки'],['⚖️','Взвеситься'],['🛏️','Застелить постель']
 ];
-let reminders=read(remindersKey);
-const scheduleMigrationKey='myhub-home-schedule-initialized-v1';
-let migrationDone=false;
-try{migrationDone=localStorage.getItem(scheduleMigrationKey)==='1'}catch(e){}
-if(!migrationDone && (!Array.isArray(reminders)||reminders.length===0)){
-  reminders=defaultSchedule.map(entry=>({...entry}));
+const routineEvening=[
+  ['📚','Языки'],['🎮','Свободное время'],['💊','Принять таблетки'],['💧','Умыться']
+];
+let planItems=read(planKey);
+if(!Array.isArray(planItems))planItems=[];
+const safeTime=t=>typeof t==='string'&&/^([01]\\d|2[0-3]):[0-5]\\d$/.test(t)?t:'';
+const minutes=t=>{const p=t.split(':').map(Number);return p[0]*60+p[1]};
+const drawRoutine=(root,title,entries,items)=>{
+  root.replaceChildren();
+  const heading=make('div','home-title',title);heading.style.margin='13px 0 8px';root.append(heading);
+  entries.forEach(entry=>{const row=make('div','home-row');row.append(make('span','',entry[0]),make('span','home-row-text',entry[1]));root.append(row)});
+  items.forEach(item=>root.append(makePlanRow(item)));
+};
+function makePlanRow(item){
+  const row=make('div','home-row');
+  if(item.time){const tm=make('span','',item.time);tm.style.cssText='color:var(--muted);font-variant-numeric:tabular-nums;min-width:48px';row.append(tm)}
+  const title=make('span','home-row-text',item.text);title.contentEditable='true';title.setAttribute('role','textbox');title.setAttribute('aria-label','Изменить план');
+  title.addEventListener('blur',()=>{const next=title.textContent.trim();if(!next){title.textContent=item.text;return}item.text=next;store(planKey,planItems)});
+  const edit=make('button','home-remove','✎');edit.type='button';edit.setAttribute('aria-label','Изменить время или дату');
+  edit.addEventListener('click',()=>{planName.value=item.text;planTime.value=item.time||'';planDate.value=item.date||'';editingPlanId=item.id;openPlanForm()});
+  const del=make('button','home-remove','×');del.type='button';del.setAttribute('aria-label','Удалить план');
+  del.addEventListener('click',()=>{planItems=planItems.filter(p=>p.id!==item.id);store(planKey,planItems);renderDayPlan()});
+  row.append(title,edit,del);return row;
 }
-if(!Array.isArray(reminders))reminders=[];
-reminders=reminders.map(entry=>({time:entry.time||'',text:String(entry.text||'')}));
-store(remindersKey,reminders);
-try{localStorage.setItem(scheduleMigrationKey,'1')}catch(e){}
-function drawReminders(){
-remindersList.replaceChildren();
-if(!reminders.length)remindersList.append(make('div','home-empty','Добавь дело с временем ниже'));
-const sorted=reminders.map((entry,index)=>({...entry,index})).sort((a,b)=>a.time.localeCompare(b.time));
-sorted.forEach(reminder=>{
-const row=make('div','home-row');
-const time=make('input','home-field');time.type='time';time.value=reminder.time||'';time.style.width='105px';time.style.padding='7px';time.style.flex='0 0 auto';time.setAttribute('aria-label','Изменить время');
-time.addEventListener('change',()=>{reminders[reminder.index].time=time.value;store(remindersKey,reminders);drawReminders()});
-const txt=make('span','home-row-text',reminder.text);txt.contentEditable='true';txt.setAttribute('role','textbox');txt.setAttribute('tabindex','0');txt.setAttribute('aria-label','Изменить дело');
-txt.addEventListener('input',()=>{reminders[reminder.index].text=txt.textContent;store(remindersKey,reminders)});
-const del=make('button','home-remove','×');del.type='button';del.setAttribute('aria-label','Удалить дело');
-del.addEventListener('click',()=>{reminders.splice(reminder.index,1);store(remindersKey,reminders);drawReminders()});
-row.append(time,txt,del);remindersList.append(row);
+function renderDayPlan(){
+  const today=dayKey();
+  const shown=planItems.filter(item=>!item.date||item.date===today);
+  const byTime=shown.filter(item=>safeTime(item.time)).sort((a,b)=>a.time.localeCompare(b.time));
+  drawRoutine(dayPlanMorning,'☀️ Утро · до 16:00',routineMorning,byTime.filter(item=>minutes(item.time)<16*60));
+  drawRoutine(dayPlanEvening,'🌙 Вечер · после 16:00',routineEvening,byTime.filter(item=>minutes(item.time)>=16*60));
+  dayPlanLoose.replaceChildren();
+  const heading=make('div','home-title','📌 Планы');heading.style.margin='13px 0 8px';dayPlanLoose.append(heading);
+  const loose=shown.filter(item=>!safeTime(item.time));
+  if(!loose.length)dayPlanLoose.append(make('div','home-muted','Пока ничего не добавлено'));
+  loose.forEach(item=>dayPlanLoose.append(makePlanRow(item)));
+}
+let editingPlanId=null;
+function openPlanForm(){planForm.hidden=false;planForm.style.display='grid';planForm.style.gap='9px';planAddButton.hidden=true;planAddButton.style.display='none';planName.focus()}
+function closePlanForm(){editingPlanId=null;planForm.hidden=true;planForm.style.display='none';planAddButton.hidden=false;planAddButton.style.display='';planName.value='';planTime.value='';planDate.value=''}
+planAddButton.addEventListener('click',openPlanForm);
+planCancel.addEventListener('click',closePlanForm);
+planSave.addEventListener('click',()=>{
+  const name=planName.value.trim();if(!name)return;
+  const tm=planTime.value;const date=planDate.value;
+  if(editingPlanId!==null){const item=planItems.find(p=>p.id===editingPlanId);if(item)Object.assign(item,{text:name,time:tm,date})}
+  else planItems.push({id:String(Date.now())+'-'+Math.random().toString(36).slice(2),text:name,time:tm,date});
+  store(planKey,planItems);closePlanForm();renderDayPlan();
 });
+planName.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();planSave.click()}});
+renderDayPlan();
+const workStages=[
+  {start:420,end:705,name:'Работа',next:'Фокус'},
+  {start:705,end:780,name:'Фокус',next:'Перерыв / тренировка'},
+  {start:780,end:840,name:'Перерыв / тренировка',next:'Фокус'},
+  {start:840,end:960,name:'Фокус',next:'Конец рабочего дня'}
+];
+function clock(min){return String(Math.floor(min/60)).padStart(2,'0')+':'+String(min%60).padStart(2,'0')}
+function updateWorkTimer(){
+  const now=new Date(),sec=now.getHours()*3600+now.getMinutes()*60+now.getSeconds(),current=sec/60;
+  const active=workStages.find(stage=>current>=stage.start&&current<stage.end);
+  const top=make('div','');top.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:10px';
+  const title=make('strong','','💻 Рабочий день');const hours=make('span','home-muted','07:00–16:00');top.append(title,hours);
+  const middle=make('div','');middle.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:12px';
+  const left=make('div','');const right=make('div','');right.style.textAlign='right';
+  const label=make('div','home-title',active?active.name:current<420?'До начала работы':'Рабочий день завершён');
+  const time=make('div','home-muted',active?clock(active.start)+'–'+clock(active.end):current<420?'Начало в 07:00':'До завтра');
+  left.append(label,time);
+  const nextBoundary=active?active.end*60:current<420?420*60:(24+7)*3600;
+  const secondsLeft=Math.max(0,Math.ceil(nextBoundary-sec));
+  const digits=String(Math.floor(secondsLeft/3600)).padStart(2,'0')+':'+String(Math.floor(secondsLeft%3600/60)).padStart(2,'0')+':'+String(secondsLeft%60).padStart(2,'0');
+  const countdown=make('strong','',digits);countdown.style.cssText='font-size:23px;font-variant-numeric:tabular-nums;letter-spacing:-.04em';
+  right.append(countdown,make('div','home-muted',active?'До конца этапа':current<420?'До начала':'До следующего дня'));
+  middle.append(left,right);
+  const progress=active?Math.min(100,Math.max(0,Math.floor((current-active.start)/(active.end-active.start)*100))):current<420?0:100;
+  const track=make('div','');track.style.cssText='height:6px;border-radius:20px;background:var(--line);overflow:hidden';
+  const fill=make('div','');fill.style.cssText='height:100%;width:'+progress+'%;background:var(--accent);border-radius:20px';track.append(fill);
+  const bottom=make('div','');bottom.style.cssText='display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)';
+  bottom.append(make('span','',progress+'% выполнено'),make('span','',active?'Далее: '+active.next:current<420?'Далее: работа':'Далее: работа в 07:00'));
+  planTimer.replaceChildren(top,middle,track,bottom);
 }
-function addReminder(){const value=remInput.value.trim();if(!value)return;reminders.push({time:remTime.value,text:value});store(remindersKey,reminders);remInput.value='';drawReminders()}
-remAdd.addEventListener('click',addReminder);
-remInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addReminder()}});
-drawReminders();
+updateWorkTimer();
+setInterval(()=>{updateWorkTimer();if(dayKey()!==lastPlanDay){lastPlanDay=dayKey();renderDayPlan()}},1000);
+let lastPlanDay=dayKey();
 function refresh(){
 const now=new Date(),d=now.getDay(),w=workouts[d],careDay=careMe[d];
 workoutTitle.textContent=w.title;
