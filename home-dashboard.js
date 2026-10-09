@@ -63,7 +63,8 @@ const planCancel=make('button','chip','Отмена');planCancel.type='button';
 const planInputs=make('div','home-add-line');planInputs.append(planTime,planDate);
 const planButtons=make('div','home-add-line');planButtons.append(planSave,planCancel);
 planForm.append(planName,planInputs,make('div','home-muted','Время и дата необязательны. Без времени дело появится в «Планах». Уведомления не отправляются.'),planButtons);
-dayPlanPanel.append(dayPlanMorning,planTimer,dayPlanEvening,dayPlanLoose,planAddButton,planForm);
+const workoutPlanRow=make('div','home-row');workoutPlanRow.append(make('span','','🏋️'),make('span','home-row-text','Тренировка (в перерыв)'));
+dayPlanPanel.append(dayPlanMorning,planTimer,workoutPlanRow,dayPlanEvening,dayPlanLoose,planAddButton,planForm);
 const notesPanel=panel('📝 Заметки',false);
 const draft=make('textarea','home-field');draft.rows=3;draft.placeholder='Записать мысль…';notesPanel.append(draft);
 const addNote=make('button','chip home-action','Сохранить заметку +');addNote.type='button';notesPanel.append(addNote);
@@ -135,7 +136,7 @@ const routineEvening=[
 ];
 let planItems=read(planKey);
 if(!Array.isArray(planItems))planItems=[];
-const safeTime=t=>typeof t==='string'&&/^([01]\\d|2[0-3]):[0-5]\\d$/.test(t)?t:'';
+const safeTime=t=>typeof t==='string'&&/^([01]\d|2[0-3]):[0-5]\d$/.test(t)?t:'';
 const minutes=t=>{const p=t.split(':').map(Number);return p[0]*60+p[1]};
 const drawRoutine=(root,title,entries,items)=>{
   root.replaceChildren();
