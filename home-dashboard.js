@@ -78,10 +78,11 @@ function nextCzechWord(){
   const saved=read(czechRotationKey);
   const previous=typeof saved?.last==='string'?saved.last:null;
   let remaining=Array.isArray(saved?.remaining)?saved.remaining.filter((key,i,arr)=>keys.includes(key)&&arr.indexOf(key)===i):[];
-  const newKeys=keys.filter(key=>key!==previous&&!remaining.includes(key));
+  const known=Array.isArray(saved?.known)?saved.known:keys;
+  const added=keys.filter(key=>!known.includes(key));
   if(remaining.length){
-    // Newly added vocabulary joins the current cycle without losing progress.
-    remaining=shuffleWords([...remaining,...newKeys]);
+    // Only genuinely new vocabulary joins an unfinished cycle.
+    remaining=shuffleWords([...remaining,...added]);
   }else{
     remaining=shuffleWords(keys);
   }
@@ -91,7 +92,7 @@ function nextCzechWord(){
   }
   const chosen=remaining.pop();
   wordIndex=czechWords.findIndex(w=>w.cz===chosen);
-  store(czechRotationKey,{remaining,last:chosen});
+  store(czechRotationKey,{remaining,last:chosen,known:keys});
   revealed=false;
   paintWord();
 }
