@@ -776,6 +776,10 @@ function allShoppingRows(){
   }));
   return rows;
 }
+// Display groceries in Czech while preserving the original item IDs and stored states.
+function shoppingDisplayName(group,item){
+  return group.startsWith('Продукты') ? item.replace(/\s*\([^()]*[А-Яа-яЁё][^()]*\)\s*$/u,'').trim() : item;
+}
 function renderDoneOnly(root,term){
   const done=allShoppingRows().filter(x=>x.checked && (!term || x.item.toLowerCase().includes(term)));
   const wrap=document.createElement('div');wrap.className='card';
@@ -783,7 +787,7 @@ function renderDoneOnly(root,term){
   const content=wrap.querySelector('.collapse-content');
   done.forEach(x=>{
     const row=document.createElement('div');row.className='item done';
-    row.innerHTML=`<input type="checkbox" id="done-${x.id}" checked><label for="done-${x.id}">${x.item}<div class="small" style="margin-top:3px">${x.group}</div></label>`;
+    row.innerHTML=`<input type="checkbox" id="done-${x.id}" checked><label for="done-${x.id}">${shoppingDisplayName(x.group,x.item)}<div class="small" style="margin-top:3px">${x.group}</div></label>`;
     row.querySelector('input').addEventListener('change',e=>setShopState(x.group,x.item,e.target.checked));
     content.appendChild(row);
   });
@@ -813,10 +817,10 @@ function renderShopping(){
         visible++;
         const row=document.createElement('div');row.className='item'+(checked?' done':'');
         if(deleteModeGroups.has(group)){
-          row.innerHTML=`<button class="delete-item-btn" type="button" aria-label="Удалить">−</button><label>${item}</label>`;
+          row.innerHTML=`<button class="delete-item-btn" type="button" aria-label="Удалить">−</button><label>${shoppingDisplayName(group,item)}</label>`;
           row.querySelector('.delete-item-btn').addEventListener('click',()=>{shopping[group]=shopping[group].filter(x=>x!==item);if(!deletedItems.includes(id)){deletedItems.push(id);localStorage.setItem(deletedItemsKey,JSON.stringify(deletedItems))}if(customItems[group]){customItems[group]=customItems[group].filter(x=>x!==item);if(!customItems[group].length)delete customItems[group];localStorage.setItem(customItemsKey,JSON.stringify(customItems))}delete saved[id];localStorage.setItem(key,JSON.stringify(saved));recipeAdded=recipeAdded.filter(x=>x!==item);localStorage.setItem(recipeAddedKey,JSON.stringify(recipeAdded));renderShopping();renderToday()});
         }else{
-          row.innerHTML=`<input type="checkbox" id="${id}" ${checked?'checked':''}><label for="${id}">${item}</label>`;
+          row.innerHTML=`<input type="checkbox" id="${id}" ${checked?'checked':''}><label for="${id}">${shoppingDisplayName(group,item)}</label>`;
           row.querySelector('input').addEventListener('change',e=>setShopState(group,item,e.target.checked));
         }
         content.appendChild(row);
