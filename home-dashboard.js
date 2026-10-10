@@ -189,26 +189,42 @@ const workStages=[
 ];
 function clock(min){return String(Math.floor(min/60)).padStart(2,'0')+':'+String(min%60).padStart(2,'0')}
 function updateWorkTimer(){
-  const now=new Date(),sec=now.getHours()*3600+now.getMinutes()*60+now.getSeconds(),current=sec/60;
-  const active=workStages.find(stage=>current>=stage.start&&current<stage.end);
+  const now=new Date();
+  const day=now.getDay();
+  const sec=now.getHours()*3600+now.getMinutes()*60+now.getSeconds();
+  const current=sec/60;
+  // Monday-Friday only. Before 07:00 and after a short end-of-day message, hide the timer.
+  const isWeekend=day===0||day===6;
+  const showFinished= !isWeekend && sec>=16*3600 && sec<16*3600+5*60;
+  const active=!isWeekend?workStages.find(stage=>current>=stage.start&&current<stage.end):null;
+  if(!active&&!showFinished){
+    planTimer.hidden=true;
+    planTimer.style.display='none';
+    return;
+  }
+  planTimer.hidden=false;
+  planTimer.style.display='grid';
   const top=make('div','');top.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:10px';
-  const title=make('strong','','💻 Рабочий день');const hours=make('span','home-muted','07:00–16:00');top.append(title,hours);
+  top.append(make('strong','','💻 Рабочий день'),make('span','home-muted','07:00–16:00'));
+  if(showFinished){
+    const finished=make('div','home-title','Рабочий день окончен 🎉');
+    const rest=make('div','home-muted','Отдыхай, завтра продолжим!');
+    planTimer.replaceChildren(top,finished,rest);
+    return;
+  }
   const middle=make('div','');middle.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:12px';
   const left=make('div','');const right=make('div','');right.style.textAlign='right';
-  const label=make('div','home-title',active?active.name:current<420?'До начала работы':'Рабочий день завершён');
-  const time=make('div','home-muted',active?clock(active.start)+'–'+clock(active.end):current<420?'Начало в 07:00':'До завтра');
-  left.append(label,time);
-  const nextBoundary=active?active.end*60:current<420?420*60:(24+7)*3600;
-  const secondsLeft=Math.max(0,Math.ceil(nextBoundary-sec));
+  left.append(make('div','home-title',active.name),make('div','home-muted',clock(active.start)+'–'+clock(active.end)));
+  const secondsLeft=Math.max(0,Math.ceil(active.end*60-sec));
   const digits=String(Math.floor(secondsLeft/3600)).padStart(2,'0')+':'+String(Math.floor(secondsLeft%3600/60)).padStart(2,'0')+':'+String(secondsLeft%60).padStart(2,'0');
   const countdown=make('strong','',digits);countdown.style.cssText='font-size:23px;font-variant-numeric:tabular-nums;letter-spacing:-.04em';
-  right.append(countdown,make('div','home-muted',active?'До конца этапа':current<420?'До начала':'До следующего дня'));
+  right.append(countdown,make('div','home-muted','До конца этапа'));
   middle.append(left,right);
-  const progress=active?Math.min(100,Math.max(0,Math.floor((current-active.start)/(active.end-active.start)*100))):current<420?0:100;
+  const progress=Math.min(100,Math.max(0,Math.floor((current-active.start)/(active.end-active.start)*100)));
   const track=make('div','');track.style.cssText='height:6px;border-radius:20px;background:var(--line);overflow:hidden';
   const fill=make('div','');fill.style.cssText='height:100%;width:'+progress+'%;background:var(--accent);border-radius:20px';track.append(fill);
   const bottom=make('div','');bottom.style.cssText='display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)';
-  bottom.append(make('span','',progress+'% выполнено'),make('span','',active?'Далее: '+active.next:current<420?'Далее: работа':'Далее: работа в 07:00'));
+  bottom.append(make('span','',progress+'% выполнено'),make('span','','Далее: '+active.next));
   planTimer.replaceChildren(top,middle,track,bottom);
 }
 updateWorkTimer();
