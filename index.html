@@ -778,6 +778,22 @@ shopping['Одежда']=pragueClothingList.slice();
 customItems['Одежда']=[];
 localStorage.setItem(customItemsKey,JSON.stringify(customItems));
 
+/* Current Prague shopping checklist; preserve prior urgent items in their categories. */
+const todayShoppingGroup='Сегодняшний план покупок';
+(shopping['Срочно купить']||[]).forEach(item=>{
+ const destination=item.startsWith('Malá powerbanka')?'Электроника':'Косметика и уход';
+ if(!shopping[destination].includes(item))shopping[destination].push(item);
+});
+delete shopping['Срочно купить'];
+shopping[todayShoppingGroup]=[
+ ...pragueClothingList,
+ 'Lékárna: vzorky SPF a hydratačních krémů',
+ 'Lékárna: dělička tablet na čtyři části'
+];
+shopping['Одежда']=[];
+customItems['Одежда']=[];
+localStorage.setItem(customItemsKey,JSON.stringify(customItems));
+
 function setFilterButton(filter){
   document.querySelectorAll('[data-shopfilter]').forEach(x=>x.classList.toggle('active',x.dataset.shopfilter===filter));
 }
@@ -829,7 +845,7 @@ function renderShopping(){
       if(group==='Продукты — рамен') return;
       if(group==='Куплено / уже есть' && shopFilter==='open') return;
       const wrap=document.createElement('div');wrap.className='card';
-      const badge=group==='Срочно купить'?'<span class="badge now">срочно</span>':group==='Купить в ближайшее время'?'<span class="badge now">сейчас</span>':group==='Плановые покупки по надобности'?'<span class="badge later">планово</span>':'';
+      const badge=group===todayShoppingGroup?'<span class="badge now">сегодня</span>':group==='Купить в ближайшее время'?'<span class="badge now">сейчас</span>':group==='Плановые покупки по надобности'?'<span class="badge later">планово</span>':'';
       wrap.innerHTML=`<div class="group-head"><button class="collapse-btn"><h3>${group==='Продукты — обычные'?'Продукты':group}${badge}</h3><span>⌄</span></button><button class="add-item-btn" type="button">+ Добавить</button><button class="delete-mode-btn" type="button">${deleteModeGroups.has(group)?'Готово':'Удалить'}</button></div><div class="collapse-content"></div>`;
       wrap.querySelector('.add-item-btn').addEventListener('click',e=>{e.stopPropagation();openAddItemSheet(group)});
       const content=wrap.querySelector('.collapse-content');
@@ -851,7 +867,7 @@ function renderShopping(){
         content.appendChild(row);
       });
       if(!visible) return;
-      if(group!=='Срочно купить') content.classList.add('hidden');
+      if(group!==todayShoppingGroup) content.classList.add('hidden');
       wrap.querySelector('.collapse-btn').addEventListener('click',()=>content.classList.toggle('hidden'));
       root.appendChild(wrap);
     });
@@ -927,11 +943,11 @@ function renderWorkouts(){const root=document.getElementById('workoutDays');root
 
 function renderToday(){
  const d=now.getDay(); const w=workouts[d];
- let nearest=[]; (shopping['Срочно купить']||[]).forEach(item=>{const id=itemId('Срочно купить',item);const checked=saved[id]??false;if(!checked)nearest.push(item)});
+ let nearest=[]; (shopping[todayShoppingGroup]||[]).forEach(item=>{const id=itemId(todayShoppingGroup,item);const checked=saved[id]??false;if(!checked)nearest.push(item)});
  const c=careMe[d];
  const preview=nearest.slice(0,4).map(x=>`• ${x}`).join('<br>');
  const more=nearest.length>4?`<div class="small" style="margin-top:6px">+ ещё ${nearest.length-4}</div>`:'';
- document.getElementById('todayCard').innerHTML=`<h2>Сегодня</h2><div class="steps"><div class="step"><b>Уход вечером:</b> ${c[1].replace(/^Вечер:\s*/,'')}</div><div class="step"><b>Тренировка:</b> ${w.title}${w.video?' — '+w.video:''}</div><div class="step"><b>Ближайшие покупки:</b><div style="margin-top:6px;line-height:1.5">${preview||'Ничего срочного'}</div>${more}</div></div>`;
+ document.getElementById('todayCard').innerHTML=`<h2>Сегодня</h2><div class="steps"><div class="step"><b>Уход вечером:</b> ${c[1].replace(/^Вечер:\s*/,'')}</div><div class="step"><b>Тренировка:</b> ${w.title}${w.video?' — '+w.video:''}</div><div class="step"><b>Сегодняшний план покупок:</b><div style="margin-top:6px;line-height:1.5">${preview||'План выполнен'}</div>${more}</div></div>`;
 }
 
 
@@ -1116,7 +1132,7 @@ renderShopping();renderCareBlock('careMe',careMe);renderCareBlock('careNikita',c
 <script>
 /* Explicit shopping panel order independent of category/object insertion order. */
 (function(){
-  const desired=['Срочно купить','Продукты','Косметика и уход','Ногти','Электроника','Одежда','Дом','Куплено / уже есть'];
+  const desired=['Сегодняшний план покупок','Продукты','Косметика и уход','Ногти','Электроника','Одежда','Дом','Куплено / уже есть'];
   const root=document.getElementById('shoppingGroups');
   function sortShopping(){
     if(!root)return;
@@ -1140,7 +1156,7 @@ renderShopping();renderCareBlock('careMe',careMe);renderCareBlock('careNikita',c
     const find=label=>panels.find(panel=>panel.querySelector('summary')?.textContent.includes(label));
     const reminders=find('Дневной план');
     const notes=find('Заметки');
-    const urgent=find('Срочно купить');
+    const urgent=find('Сегодняшний план покупок');
     if(reminders&&notes&&urgent){
       layout.append(reminders,notes,urgent);
     }
