@@ -763,6 +763,21 @@ oldShoppingGroups.forEach(group=>{
 });
 localStorage.setItem(customItemsKey,JSON.stringify(customItems));
 
+/* Prague shopping trip: Czech-only clothing checklist. Keep all other categories intact. */
+const pragueClothingList=[
+  'Kožené tenisky s prostornou špičkou',
+  'Domácí souprava',
+  'Noční košile',
+  'Černý svetr',
+  'Podzimní nebo zimní šaty',
+  'Tenké legíny pod kalhoty bez těsné gumy v pase, ideálně s páskem pod chodidlo',
+  'Kožená bunda – podívat se v Baťa',
+  'Pláštěnka / větrovka'
+];
+shopping['Одежда']=pragueClothingList.slice();
+customItems['Одежда']=[];
+localStorage.setItem(customItemsKey,JSON.stringify(customItems));
+
 function setFilterButton(filter){
   document.querySelectorAll('[data-shopfilter]').forEach(x=>x.classList.toggle('active',x.dataset.shopfilter===filter));
 }
