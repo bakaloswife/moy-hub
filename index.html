@@ -795,6 +795,25 @@ shopping['Одежда']=['Domácí top — Primark'];
 customItems['Одежда']=[];
 localStorage.setItem(customItemsKey,JSON.stringify(customItems));
 
+/* Keep mascara under cosmetics, including previously saved custom items. */
+const isMascaraItem=item=>/řasenka|mascara|тушь для ресниц/i.test(item);
+for(const item of [...(shopping['Дом']||[])]){
+  if(!isMascaraItem(item))continue;
+  shopping['Дом']=shopping['Дом'].filter(value=>value!==item);
+  if(!shopping['Косметика и уход'].includes(item))shopping['Косметика и уход'].push(item);
+}
+if(Array.isArray(customItems['Дом'])){
+  const moved=customItems['Дом'].filter(isMascaraItem);
+  customItems['Дом']=customItems['Дом'].filter(item=>!isMascaraItem(item));
+  if(moved.length){
+    customItems['Косметика и уход']=customItems['Косметика и уход']||[];
+    moved.forEach(item=>{if(!customItems['Косметика и уход'].includes(item))customItems['Косметика и уход'].push(item)});
+    localStorage.setItem(customItemsKey,JSON.stringify(customItems));
+  }
+}
+const homeForks='Vidličky (вилки)';
+if(!shopping['Дом'].includes(homeForks)&&!deletedItems.includes(itemId('Дом',homeForks)))shopping['Дом'].push(homeForks);
+
 function setFilterButton(filter){
   document.querySelectorAll('[data-shopfilter]').forEach(x=>x.classList.toggle('active',x.dataset.shopfilter===filter));
 }
