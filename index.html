@@ -1041,12 +1041,43 @@ const czechWords=[
   {cz:'pesimistický',ru:'пессимистичный',note:'жен. pesimistická'},
   {cz:'smutný',ru:'грустный',note:'жен. smutná'},
   {cz:'optimistický',ru:'оптимистичный',note:'жен. optimistická'},
-  {cz:'veselý',ru:'весёлый',note:'жен. veselá'}
+  {cz:'veselý',ru:'весёлый',note:'жен. veselá'},
+  {cz:'stihnout',ru:'успеть',note:'Stihnu to. — Я успею'},
+  {cz:'zapomenout',ru:'забыть',note:'Zapomněl jsem. — Я забыл'},
+  {cz:'pamatovat si',ru:'помнить',note:'Nepamatuju si. — Я не помню'},
+  {cz:'potřebovat',ru:'нуждаться, быть нужным',note:'Potřebuju pomoc. — Мне нужна помощь'},
+  {cz:'vyzvednout',ru:'забрать (вещь, заказ)',note:'Vyzvednout balík — забрать посылку'},
+  {cz:'objednat se',ru:'записаться на приём',note:'Objednat se k lékaři — записаться к врачу'},
+  {cz:'zrušit',ru:'отменить',note:'Zrušit schůzku — отменить встречу'},
+  {cz:'domluvit se',ru:'договориться',note:'Můžeme se domluvit. — Мы можем договориться'},
+  {cz:'čekat',ru:'ждать',note:'Počkám tady. — Я подожду здесь'},
+  {cz:'vysvětlit',ru:'объяснить',note:'Můžete mi to vysvětlit? — Можете объяснить?'},
+  {cz:'zopakovat',ru:'повторить',note:'Můžete to zopakovat? — Можете повторить?'},
+  {cz:'rozumět',ru:'понимать',note:'Nerozumím. — Я не понимаю'},
+  {cz:'zvládnout',ru:'справиться',note:'Zvládnu to. — Я справлюсь'},
+  {cz:'zkusit',ru:'попробовать',note:'Zkusím to. — Я попробую'},
+  {cz:'platit',ru:'платить, быть действительным',note:'Platím kartou. — Плачу картой'},
+  {cz:'účtenka',ru:'чек',note:'Můžu dostat účtenku? — Можно чек?'},
+  {cz:'sleva',ru:'скидка',note:'Je na to sleva? — На это скидка?'},
+  {cz:'volno',ru:'свободное время, выходной',note:'Mám volno. — У меня выходной'},
+  {cz:'obsazeno',ru:'занято',note:'Je obsazeno. — Занято'},
+  {cz:'příště',ru:'в следующий раз',note:'Příště přijdu dřív. — В следующий раз приду раньше'},
+  {cz:'hned',ru:'сразу, сейчас же',note:'Hned přijdu. — Сейчас приду'},
+  {cz:'pozdě',ru:'поздно',note:'Je pozdě. — Уже поздно'},
+  {cz:'brzy',ru:'рано, скоро',note:'Přijdu brzy. — Приду рано'},
+  {cz:'ještě',ru:'ещё',note:'Ještě chvíli. — Ещё немного'},
+  {cz:'už',ru:'уже',note:'Už jdu. — Уже иду'},
+  {cz:'stačit',ru:'хватать, быть достаточным',note:'To stačí. — Этого достаточно'},
+  {cz:'vadit',ru:'мешать, быть неприятным',note:'Nevadí. — Ничего страшного'},
+  {cz:'bolet',ru:'болеть, причинять боль',note:'Bolí mě hlava. — У меня болит голова'},
+  {cz:'půjčit si',ru:'одолжить, взять на время',note:'Můžu si půjčit tužku? — Можно одолжить карандаш?'}
 ];
+// Daily-use vocabulary for cards; full dictionary stays available in the word list.
+const everydayCzechKeys=new Set(["žízeň","příbor","lžíce","vidlička","nůž","lžička","talíř","sklenice","ubrousek","miska","hrnek","tričko","kalhoty","sukně","šaty","bunda","boty","spěchat","spravit","upravit","doporučovat","najít","začít","žádat","smůla","vztek","hodný","příjemný","stihnout","zapomenout","pamatovat si","potřebovat","vyzvednout","objednat se","zrušit","domluvit se","čekat","vysvětlit","zopakovat","rozumět","zvládnout","zkusit","platit","účtenka","sleva","volno","obsazeno","příště","hned","pozdě","brzy","ještě","už","stačit","vadit","bolet","půjčit si"]);
 const czechReviewKey='myhub-czech-review-v1';
 let czechReview={};try{czechReview=JSON.parse(localStorage.getItem(czechReviewKey)||'{}')}catch(e){czechReview={}}
 const reviewIntervals=[1,3,7,14,30,60];
-let czechDeck=[...czechWords];
+let czechDeck=czechWords.filter(w=>everydayCzechKeys.has(w.cz));
 let czechCardIndex=0;
 let czechCardRevealed=false;
 let reviewQueue=[];
