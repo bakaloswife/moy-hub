@@ -813,6 +813,8 @@ if(Array.isArray(customItems['Дом'])){
 }
 const homeForks='Vidličky (вилки)';
 if(!shopping['Дом'].includes(homeForks)&&!deletedItems.includes(itemId('Дом',homeForks)))shopping['Дом'].push(homeForks);
+const wardrobeLavender='Levandulové sáčky do skříně proti molům (лаванда для шкафа от моли)';
+if(!shopping['Дом'].includes(wardrobeLavender)&&!deletedItems.includes(itemId('Дом',wardrobeLavender)))shopping['Дом'].push(wardrobeLavender);
 
 function setFilterButton(filter){
   document.querySelectorAll('[data-shopfilter]').forEach(x=>x.classList.toggle('active',x.dataset.shopfilter===filter));
