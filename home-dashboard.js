@@ -72,7 +72,7 @@ const notesList=make('div','home-list');notesPanel.append(notesList);
 const urgent=panel('🛒 Сегодняшний план покупок');
 const urgentList=make('div','home-list');urgent.append(urgentList);go('shopping',urgent,'Все покупки →');
 let wordIndex=0,revealed=false;
-const czechRotationKey='myhub-home-czech-rotation-v1';
+const czechRotationKey='myhub-home-czech-rotation-v2';
 const shuffleWords=items=>{
   const list=[...items];
   for(let i=list.length-1;i>0;i--){
@@ -83,7 +83,7 @@ const shuffleWords=items=>{
 };
 function nextCzechWord(){
   if(!czechWords.length)return;
-  const keys=[...new Set(czechWords.map(w=>w.cz))];
+  const keys=[...new Set(czechWords.filter(w=>typeof everydayCzechKeys==='undefined'||everydayCzechKeys.has(w.cz)).map(w=>w.cz))];
   const saved=read(czechRotationKey);
   const previous=typeof saved?.last==='string'?saved.last:null;
   let remaining=Array.isArray(saved?.remaining)?saved.remaining.filter((key,i,arr)=>keys.includes(key)&&arr.indexOf(key)===i):[];
