@@ -124,7 +124,12 @@ del.addEventListener('click',()=>{notes.splice(i,1);store(notesKey,notes);drawNo
 row.append(txt,del);notesList.append(row);
 });
 }
-addNote.addEventListener('click',()=>{const value=draft.value.trim();if(!value)return;notes.unshift({text:value,date:new Date().toISOString()});store(notesKey,notes);draft.value='';try{localStorage.removeItem(draftKey)}catch(e){}drawNotes()});
+addNote.addEventListener('click',()=>{
+  const value=draft.value.trim();if(!value)return;
+  const next=[{text:value,date:new Date().toISOString()},...notes];
+  if(!store(notesKey,next))return;
+  notes=next;draft.value='';try{localStorage.removeItem(draftKey)}catch(e){}drawNotes();
+});
 drawNotes();
 const planKey='myhub-day-plan-v1';
 const routineMorning=[

@@ -104,5 +104,40 @@ async function checkUI(page,group,item){const card=groupCard(page,group);await c
     await page.evaluate(()=>{addShoppingItem('Дом','чай | кофе');deleteShoppingItem('Дом','чай | кофе')});await page.reload();assert.equal((await has(page,'чай | кофе')).length,0);assert.equal((await has(page,'кофе')).length,0);
     await page.evaluate(()=>{addShoppingItem('Дом','чай | кофе');addShoppingItem('Дом','кофе');setShopState('Дом','чай | кофе',true,false)});await page.reload();assert.equal((await has(page,'чай | кофе'))[0].checked,true);assert.equal((await has(page,'кофе'))[0].checked,false);
   });
+  const notesPanel=page=>page.locator('.home-panel').filter({has:page.locator('summary',{hasText:'Заметки'})});
+  const planPanel=page=>page.locator('.home-panel').filter({has:page.locator('summary',{hasText:'Дневной план'})});
+  await scenario('Existing draft survives failed note save',{'myhub-home-notes-v1':'[','myhub-home-note-draft-v1':'Важный существующий черновик'},async page=>{
+    const panel=notesPanel(page);await panel.locator('summary').click();await panel.getByRole('button',{name:'Сохранить заметку +'}).click();
+    assert.equal(await page.evaluate(()=>localStorage.getItem('myhub-home-note-draft-v1')),'Важный существующий черновик');assert.equal(await panel.locator('textarea').inputValue(),'Важный существующий черновик');assert.equal(await page.evaluate(()=>localStorage.getItem('myhub-home-notes-v1')),'[');
+    await page.reload();await notesPanel(page).locator('summary').click();assert.equal(await notesPanel(page).locator('textarea').inputValue(),'Важный существующий черновик');
+  });
+  await scenario('Existing draft survives quota error',{'myhub-home-notes-v1':'[{"text":"Старая заметка"}]','myhub-home-note-draft-v1':'Черновик при переполнении'},async page=>{
+    await page.evaluate(()=>{const original=Storage.prototype.setItem;Storage.prototype.setItem=function(key,value){if(key==='myhub-home-notes-v1')throw new DOMException('Full','QuotaExceededError');return original.call(this,key,value)}});
+    const panel=notesPanel(page);await panel.locator('summary').click();await panel.getByRole('button',{name:'Сохранить заметку +'}).click();assert.equal(await page.evaluate(()=>localStorage.getItem('myhub-home-note-draft-v1')),'Черновик при переполнении');assert.equal(await page.evaluate(()=>localStorage.getItem('myhub-home-notes-v1')),'[{"text":"Старая заметка"}]');assert.equal(await panel.locator('.home-row').count(),1);
+  });
+  await scenario('Note add edit delete preserves unrelated notes',{'myhub-home-notes-v1':'[{"text":"Существующая заметка"}]'},async page=>{
+    let panel=notesPanel(page);await panel.locator('summary').click();await panel.locator('textarea').fill('Новая заметка');await panel.getByRole('button',{name:'Сохранить заметку +'}).click();await page.reload();panel=notesPanel(page);await panel.locator('summary').click();const text=panel.locator('[contenteditable]').filter({hasText:'Новая заметка'});await text.fill('Изменённая заметка');await page.reload();panel=notesPanel(page);await panel.locator('summary').click();await panel.locator('.home-row').filter({hasText:'Изменённая заметка'}).getByRole('button',{name:'Удалить заметку'}).click();await page.reload();assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('myhub-home-notes-v1'))),[{text:'Существующая заметка'}]);
+  });
+  await scenario('Daily plan add edit delete preserves unrelated plans',{'myhub-day-plan-v1':'[{"id":"old","text":"Существующий план","date":"2099-01-01"}]'},async page=>{
+    let panel=planPanel(page);await panel.getByRole('button',{name:'+ Добавить план'}).click();await panel.getByLabel('Название плана').fill('Новый план');await panel.getByLabel('Время, необязательно').fill('18:30');await panel.getByRole('button',{name:'Сохранить',exact:true}).click();await page.reload();panel=planPanel(page);const title=panel.locator('[contenteditable]').filter({hasText:'Новый план'});await title.fill('Изменённый план');await page.keyboard.press('Tab');await page.reload();panel=planPanel(page);const row=panel.locator('.home-row').filter({hasText:'Изменённый план'});await row.getByRole('button',{name:'Изменить время или дату'}).click();await panel.getByLabel('Время, необязательно').fill('19:00');await panel.getByRole('button',{name:'Сохранить',exact:true}).click();await page.reload();assert.equal((await page.evaluate(()=>JSON.parse(localStorage.getItem('myhub-day-plan-v1')))).find(x=>x.text==='Изменённый план').time,'19:00');await planPanel(page).locator('.home-row').filter({hasText:'Изменённый план'}).getByRole('button',{name:'Удалить план'}).click();await page.reload();assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('myhub-day-plan-v1'))),[{id:'old',text:'Существующий план',date:'2099-01-01'}]);
+  });
+  await scenario('Navigation and all recipe buttons remain functional',{},async page=>{
+    for(const section of ['shopping','workouts','care','czech','home']){await page.locator('.nav[data-section="'+section+'"]').click();assert.equal(await page.locator('#'+section).evaluate(el=>el.classList.contains('active')),true)}
+    await page.getByRole('button',{name:'Все тренировки →'}).click();assert.equal(await page.locator('#workoutDays > .day').count(),7);
+    await page.evaluate(()=>showSection('recipes'));for(const button of ['addCaesarToShopping','addChineseChickenToShopping','addFunchozaToShopping','addDonkatsuToShopping','addLazyLasagnaToShopping']){const card=page.locator('#'+button).locator('xpath=ancestor::div[contains(@class,"recipe-card")]');await card.locator('h3').click();await page.locator('#'+button).click()}
+    assert.ok((await rows(page)).some(x=>x.item==='Пармезан'));await page.reload();assert.ok((await rows(page)).some(x=>x.item==='Пармезан'));
+  });
+  await scenario('Czech dictionary search cards and review remain functional',{'myhub-czech-review-v1':'{"неизвестное старое слово":{"known":7}}'},async page=>{
+    await page.locator('.nav[data-section="czech"]').click();await page.locator('#czechSearch').fill('vztek');assert.equal(await page.locator('#czechWordsList .czech-word').count(),1);await page.locator('[data-czechtab="cards"]').click();assert.ok((await page.locator('#czechCardFront').textContent()).length>0);await page.locator('#czechFlashcard').click();assert.equal(await page.locator('#czechCardBack').isVisible(),true);await page.locator('#czechNext').click();await page.locator('#czechShuffle').click();await page.locator('[data-czechtab="review"]').click();await page.locator('#reviewFlashcard').click();await page.locator('#reviewGood').click();const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('myhub-czech-review-v1')));assert.deepEqual(saved['неизвестное старое слово'],{known:7});assert.ok(Object.keys(saved).length>1);await page.reload();assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('myhub-czech-review-v1'))['неизвестное старое слово']),{known:7});
+  });
+  await scenario('Default purchases preserved against repaired upstream baseline',{},async page=>{
+    const current=await page.evaluate(()=>allShoppingRows().map(row=>itemId(row.group,row.item)));
+    const matcher=fs.readFileSync(path.join(root,'index.html'),'utf8').split('\n').find(line=>line.startsWith('const isShaver='));
+    const baseline=original.replace(/^const isShaver=.*$/m,()=>matcher).replace(/<script src="home-dashboard\.js[^>]*><\/script>/,'');
+    await page.route(base+'/baseline',route=>route.fulfill({contentType:'text/html',body:baseline}));await page.goto(base+'/baseline');
+    const previous=await page.evaluate(()=>allShoppingRows().map(row=>row.item));await page.goto(base);
+    const previousIds=await page.evaluate(items=>items.map(item=>itemId('',item)),previous);
+    assert.deepEqual([...new Set(current)].sort(),[...new Set(previousIds)].sort());
+  });
   console.log(`${total} browser scenarios passed; baseline syntax failure reproduced.`);
 })().catch(error=>{console.error(error);process.exitCode=1}).finally(async()=>{if(browser)await browser.close();server.close()});
