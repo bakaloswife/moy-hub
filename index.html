@@ -530,6 +530,29 @@ h1{font-size:30px;line-height:1.05;margin:0;letter-spacing:-.02em}
 </nav>
 
 <script>
+const storageBlocked=new Set();
+const isRecord=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
+function readHubStorage(key,fallback,valid){
+  try{
+    const raw=localStorage.getItem(key);
+    if(raw===null)return fallback;
+    const value=JSON.parse(raw);
+    if(!valid(value))throw new Error('Unsupported saved data');
+    return value;
+  }catch(error){storageBlocked.add(key);console.warn('Saved data preserved:',key,error);return fallback}
+}
+function writeHubStorage(key,value){
+  try{
+    if(storageBlocked.has(key))throw new Error('Existing data requires recovery');
+    localStorage.setItem(key,JSON.stringify(value));return true;
+  }catch(error){
+    console.warn('Unable to save:',key,error);
+    let notice=document.getElementById('storageNotice');
+    if(!notice){notice=document.createElement('div');notice.id='storageNotice';notice.className='note';notice.setAttribute('role','alert');document.querySelector('.top').after(notice)}
+    notice.textContent='Не удалось сохранить изменения. Существующие данные сохранены. Проверь доступ к хранилищу браузера.';
+    return false;
+  }
+}
 const DOW=['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
 const dowShort=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
 const now=new Date();
@@ -553,7 +576,7 @@ const shopping={
   'Kuřecí vývar / bujón (куриный бульон / концентрат)','Houbový vývar / bujón (грибной бульон / концентрат)','Sriracha (шрирача)','Vepřové steaky (свиные стейки)','Pórek (лук-порей)','Pekingské zelí (пекинская капуста)','Houby shiitake (грибы шиитаке)','Nori (нори)','Sezam (кунжут)','Jarní cibulka (зелёный лук)','Česnek (чеснок)','Sezamový olej (кунжутное масло)','Ústřicová omáčka (устричный соус)','Miso pasta (мисо паста)']
 };
 const recipeAddedKey='myhub-recipe-added-v1';
-let recipeAdded=[];try{recipeAdded=JSON.parse(localStorage.getItem(recipeAddedKey)||'[]')}catch(e){}
+let recipeAdded=readHubStorage(recipeAddedKey,[],value=>Array.isArray(value)&&value.every(item=>typeof item==='string'));
 recipeAdded.forEach(item=>{if(!shopping['Продукты — обычные'].includes(item)) shopping['Продукты — обычные'].push(item)});
 const caesarIngredients=['Куриное филе','Кукуруза','Салат айсберг','Помидоры черри','Хлеб для гренок','Чеснок','Соевый соус','Масло','Майонез или греческий йогурт','Горчица','Мёд','Лимонный сок'];
 const chineseChickenIngredients=['Куриная грудка','Кукурузный крахмал','Пищевая сода','Сычуаньский перец','Имбирь','Зелёный лук','Чеснок','Красный перец','Зелёный перец','Кунжут','Растительное масло','Светлый соевый соус','Устричный соус','Соль','Сахар','Куриный бульон / приправа','Чили-масло'];
@@ -566,9 +589,9 @@ function addCaesarMissingToShopping(){
   caesarIngredients.forEach(item=>{
     const low=item.toLowerCase();
     const covered=[...existing].some(x=>x===low || (item==='Масло' && (x.includes('масло подсолнечное')||x.includes('масло сливочное'))) || (item==='Майонез или греческий йогурт' && (x==='майонез'||x.includes('греческий йогурт'))));
-    if(!covered){shopping['Продукты — обычные'].push(item);recipeAdded.push(item);existing.add(low);added.push(item)}
+    if(!covered){addShoppingItem('Продукты — обычные',item);recipeAdded.push(item);existing.add(low);added.push(item)}
   });
-  recipeAdded=[...new Set(recipeAdded)];localStorage.setItem(recipeAddedKey,JSON.stringify(recipeAdded));
+  recipeAdded=[...new Set(recipeAdded)];writeHubStorage(recipeAddedKey,recipeAdded);
   renderShopping();renderToday();
   const toast=document.getElementById('shopToast');
   document.getElementById('shopToastText').textContent=added.length?`Добавлено в покупки: ${added.length}`:'Всё из рецепта уже есть в покупках';
@@ -587,9 +610,9 @@ function addChineseChickenMissingToShopping(){
       (item==='Светлый соевый соус' && x.includes('соевый соус')) ||
       (item==='Куриный бульон / приправа' && x.includes('куриный бульон'))
     );
-    if(!covered){shopping['Продукты — обычные'].push(item);recipeAdded.push(item);existing.add(low);added.push(item)}
+    if(!covered){addShoppingItem('Продукты — обычные',item);recipeAdded.push(item);existing.add(low);added.push(item)}
   });
-  recipeAdded=[...new Set(recipeAdded)];localStorage.setItem(recipeAddedKey,JSON.stringify(recipeAdded));
+  recipeAdded=[...new Set(recipeAdded)];writeHubStorage(recipeAddedKey,recipeAdded);
   renderShopping();renderToday();
   const toast=document.getElementById('shopToast');
   document.getElementById('shopToastText').textContent=added.length?`Добавлено в покупки: ${added.length}`:'Всё из рецепта уже есть в покупках';
@@ -606,9 +629,9 @@ function addFunchozaMissingToShopping(){
       (item==='Сладкий перец' && (x.includes('болгарский перец')||x.includes('красный перец'))) ||
       (item==='Зелёный лук' && x.includes('зелёный лук'))
     );
-    if(!covered){shopping['Продукты — обычные'].push(item);recipeAdded.push(item);existing.add(low);added.push(item)}
+    if(!covered){addShoppingItem('Продукты — обычные',item);recipeAdded.push(item);existing.add(low);added.push(item)}
   });
-  recipeAdded=[...new Set(recipeAdded)];localStorage.setItem(recipeAddedKey,JSON.stringify(recipeAdded));
+  recipeAdded=[...new Set(recipeAdded)];writeHubStorage(recipeAddedKey,recipeAdded);
   renderShopping();renderToday();
   const toast=document.getElementById('shopToast');
   document.getElementById('shopToastText').textContent=added.length?`Добавлено в покупки: ${added.length}`:'Всё из рецепта уже есть в покупках';
@@ -625,9 +648,9 @@ function addDonkatsuMissingToShopping(){
       (item==='Растительное масло' && x.includes('масло подсолнечное')) ||
       (item==='Куриное филе' && (x.includes('куриное филе')||x.includes('куриная грудка')))
     );
-    if(!covered){shopping['Продукты — обычные'].push(item);recipeAdded.push(item);existing.add(low);added.push(item)}
+    if(!covered){addShoppingItem('Продукты — обычные',item);recipeAdded.push(item);existing.add(low);added.push(item)}
   });
-  recipeAdded=[...new Set(recipeAdded)];localStorage.setItem(recipeAddedKey,JSON.stringify(recipeAdded));
+  recipeAdded=[...new Set(recipeAdded)];writeHubStorage(recipeAddedKey,recipeAdded);
   renderShopping();renderToday();
   const toast=document.getElementById('shopToast');
   document.getElementById('shopToastText').textContent=added.length?`Добавлено в покупки: ${added.length}`:'Всё из рецепта уже есть в покупках';
@@ -645,9 +668,9 @@ function addLazyLasagnaMissingToShopping(){
       (item==='Говяжий или куриный бульон' && (x.includes('говяжий бульон')||x.includes('куриный бульон'))) ||
       (item==='Сливки' && x.includes('сливки'))
     );
-    if(!covered){shopping['Продукты — обычные'].push(item);recipeAdded.push(item);existing.add(low);added.push(item)}
+    if(!covered){addShoppingItem('Продукты — обычные',item);recipeAdded.push(item);existing.add(low);added.push(item)}
   });
-  recipeAdded=[...new Set(recipeAdded)];localStorage.setItem(recipeAddedKey,JSON.stringify(recipeAdded));
+  recipeAdded=[...new Set(recipeAdded)];writeHubStorage(recipeAddedKey,recipeAdded);
   renderShopping();renderToday();
   const toast=document.getElementById('shopToast');
   document.getElementById('shopToastText').textContent=added.length?`Добавлено в покупки: ${added.length}`:'Всё из рецепта уже есть в покупках';
@@ -656,46 +679,51 @@ function addLazyLasagnaMissingToShopping(){
 
 const presetDone=new Set(shopping['Куплено / уже есть']);
 const key='myhub-shopping-v1';
-let saved={};try{saved=JSON.parse(localStorage.getItem(key)||'{}')}catch(e){}
+let saved=readHubStorage(key,{},isRecord);
 
 // Стабильный ID покупки: не зависит от раздела.
 // Поэтому перенос товара между категориями/месяцами после обновления сайта
 // больше не сбрасывает отметку «куплено».
 function encodeShopId(value){return btoa(unescape(encodeURIComponent(value))).replace(/=/g,'')}
-function itemId(group,item){return encodeShopId(item.trim().toLocaleLowerCase('ru-RU'))}
+// Known clothing renames must retain purchase/deletion history across versions.
+const shoppingAliases=new Map([
+ ['Kožené tenisky s prostornou špičkou (кожаные кроссовки с широким носком на осень)','Kožené tenisky s prostornou špičkou'],
+ ['Lehká větrovka / pláštěnka (лёгкая ветровка-плащ)','Pláštěnka / větrovka'],
+ ['Černý svetr, stejný jako bílý chlupatý (чёрный свитер, как белый махровый)','Černý svetr'],
+ ['Hezké šaty na podzim/zimu (красивое платье на осень/зиму)','Podzimní nebo zimní šaty'],
+ ['Noční košile (ночнушка)','Noční košile']
+].map(([oldName,newName])=>[oldName.toLocaleLowerCase('ru-RU'),newName.toLocaleLowerCase('ru-RU')]));
+function itemId(group,item){const name=item.trim().toLocaleLowerCase('ru-RU');return encodeShopId(shoppingAliases.get(name)||name)}
 function legacyItemId(group,item){return encodeShopId(group+'|'+item)}
 
-// Миграция старых отметок, где ID зависел от названия раздела.
-let shoppingStateMigrated=false;
-Object.entries(shopping).forEach(([group,items])=>items.forEach(item=>{
-  const oldId=legacyItemId(group,item);
-  const newId=itemId(group,item);
-  if(saved[oldId]!==undefined){
-    if(saved[newId]===undefined || saved[oldId]===true) saved[newId]=saved[oldId];
-    shoppingStateMigrated=true;
-  }
-}));
-if(shoppingStateMigrated)localStorage.setItem(key,JSON.stringify(saved));
+// Decode both old category-based IDs and current IDs without deleting old data.
+function normalizedStoredId(id){
+  try{const value=decodeURIComponent(escape(atob(id)));return itemId('',value.includes('|')&&value!==value.trim().toLocaleLowerCase('ru-RU')?value.slice(value.indexOf('|')+1):value)}catch(e){return id}
+}
+Object.entries(saved).forEach(([oldId,value])=>{
+  const id=normalizedStoredId(oldId);
+  // A current explicit false must win over a stale legacy true.
+  if(saved[id]===undefined&&typeof value==='boolean')saved[id]=value;
+});
 let shopFilter='open';
 const deleteModeGroups=new Set();
 let lastShopAction=null;
 let toastTimer=null;
 let addItemGroup=null;
 const deletedItemsKey='myhub-shopping-deleted-v1';
-let deletedItems=[];try{deletedItems=JSON.parse(localStorage.getItem(deletedItemsKey)||'[]')}catch(e){}
-if(!Array.isArray(deletedItems))deletedItems=[];
+let deletedItems=readHubStorage(deletedItemsKey,[],value=>Array.isArray(value)&&value.every(id=>typeof id==='string'));
+deletedItems=[...new Set([...deletedItems,...deletedItems.map(normalizedStoredId)])];
 const customItemsKey='myhub-shopping-custom-v1';
-let customItems={};try{customItems=JSON.parse(localStorage.getItem(customItemsKey)||'{}')}catch(e){customItems={}}
+let customItems=readHubStorage(customItemsKey,{},value=>isRecord(value)&&Object.values(value).every(items=>Array.isArray(items)&&items.every(item=>typeof item==='string')));
 Object.entries(customItems).forEach(([group,items])=>{if(shopping[group]&&Array.isArray(items))items.forEach(item=>{if(typeof item==='string'&&!shopping[group].includes(item))shopping[group].push(item)})});
 Object.keys(shopping).forEach(group=>{shopping[group]=shopping[group].filter(item=>!deletedItems.includes(itemId(group,item)))});
 
 /* Shopping category reorganization. Move items by name, keeping stable IDs and deletions. */
-const shopCategoryVersion='myhub-shopping-categories-v2';
 const categoryNames=['Косметика и уход','Электроника','Одежда','Дом','Продукты — обычные'];
 const categoryKeywords={
- 'Косметика и уход':['Pilník na nehty','Kleštičky na řasy','Magnetické řasy','essence ','Hnědá tužka','Řasenka se','Průhledná růžová','UV lampa','The Ordinary','La Roche-Posay','Holicí strojek','Denní slipové vložky'],
- 'Электроника':['Remington D5706','USB-C nabíječka','Superlux','Hodinky Huawei','Micro-USB kabel','Digitální fotoaparát','Malá powerbanka'],
- 'Одежда':['Kožené tenisky','Lehká větrovka','Černý svetr','Hezké šaty','Pyžamo','Noční košile','Teplá velká domácí mikina'],
+ 'Косметика и уход':['Pilník na nehty','Kleštičky na řasy','Magnetické řasy','essence ','Hnědá tužka','Řasenka se','Průhledná růžová','UV lampa','The Ordinary','La Roche-Posay','Catrice ','Denní slipové vložky','VT Cosmetics','BHA 2%','Plumper','Solný sprej','Akneroxid','Micelární voda','Vatové tyčinky'],
+ 'Электроника':['Remington D5706','USB-C nabíječka','Superlux','Hodinky Huawei','Micro-USB kabel','Digitální fotoaparát','Malá powerbanka','Holicí strojek'],
+ 'Одежда':['Kožené tenisky','Lehká větrovka','Černý svetr','Hezké šaty','Pyžamo','Noční košile','Teplá velká domácí mikina','Podprsenka'],
  'Дом':['Struhadlo','Kelímek','Botník','Náhradní návlek','Tuhé mýdlo']
 };
 function categoryForItem(item,formerGroup){
@@ -738,31 +766,6 @@ if(shopping['Продукты — рамен']){
   delete shopping['Продукты — рамен'];
 }
 
-/* Include items previously added directly to the new thematic categories. */
-categoryNames.forEach(group=>{
-  const manual=customItems[group];
-  if(!Array.isArray(manual))return;
-  manual.forEach(item=>{
-    if(typeof item==='string'&&!deletedItems.includes(itemId(group,item))&&!shopping[group].includes(item)){
-      shopping[group].push(item);
-    }
-  });
-});
-
-/* Migrate manually added items so subsequent additions and deletions stay consistent. */
-oldShoppingGroups.forEach(group=>{
-  const manual=customItems[group];
-  if(!Array.isArray(manual))return;
-  manual.forEach(item=>{
-    const destination=categoryForItem(item,group);
-    if(!shopping[destination])return;
-    customItems[destination]=customItems[destination]||[];
-    if(!customItems[destination].includes(item))customItems[destination].push(item);
-  });
-  if(group==='Купить в ближайшее время'||group==='Плановые покупки по надобности'||group==='Продукты — рамен')delete customItems[group];
-});
-localStorage.setItem(customItemsKey,JSON.stringify(customItems));
-
 /* Prague shopping trip: Czech-only clothing checklist. Keep all other categories intact. */
 const pragueClothingList=[
   'Kožené tenisky s prostornou špičkou',
@@ -774,11 +777,10 @@ const pragueClothingList=[
   'Kožená bunda – podívat se v Baťa',
   'Pláštěnka / větrovka'
 ];
+// Defaults only: saved clothing and deletion history are reconciled below.
 shopping['Одежда']=pragueClothingList.slice();
-customItems['Одежда']=[];
-localStorage.setItem(customItemsKey,JSON.stringify(customItems));
 
-/* Preserve existing shopping categories without regenerating the temporary Prague trip list. */
+/* Retire the temporary shopping panel without erasing saved entries. */
 const todayShoppingGroup='Сегодняшний план покупок';
 (shopping['Срочно купить']||[]).forEach(item=>{
   const destination=item.startsWith('Malá powerbanka')?'Электроника':'Косметика и уход';
@@ -786,8 +788,7 @@ const todayShoppingGroup='Сегодняшний план покупок';
 });
 delete shopping['Срочно купить'];
 delete shopping[todayShoppingGroup];
-delete customItems[todayShoppingGroup];
-localStorage.setItem(customItemsKey,JSON.stringify(customItems));
+// Saved entries from this retired panel are migrated below, not discarded.
 
 /* Keep mascara under cosmetics, including previously saved custom items. */
 const isMascaraItem=item=>/řasenka|mascara|тушь для ресниц/i.test(item);
@@ -796,47 +797,28 @@ for(const item of [...(shopping['Дом']||[])]){
   shopping['Дом']=shopping['Дом'].filter(value=>value!==item);
   if(!shopping['Косметика и уход'].includes(item))shopping['Косметика и уход'].push(item);
 }
-if(Array.isArray(customItems['Дом'])){
-  const moved=customItems['Дом'].filter(isMascaraItem);
-  customItems['Дом']=customItems['Дом'].filter(item=>!isMascaraItem(item));
-  if(moved.length){
-    customItems['Косметика и уход']=customItems['Косметика и уход']||[];
-    moved.forEach(item=>{if(!customItems['Косметика и уход'].includes(item))customItems['Косметика и уход'].push(item)});
-    localStorage.setItem(customItemsKey,JSON.stringify(customItems));
-  }
-}
-/* Normalize the selected mascara and move the shaver into Electronics.
-   Also clean device-local shopping entries so legacy categories cannot re-add them. */
+/* Normalize default suggestions. Explicit device-local categories are reconciled below. */
 const selectedMascara='Catrice Glam & Doll Volume Brown Waterproof (119 Kč, Notino)';
 const isObsoleteMascara=item=>/Catrice Glam & Doll Curl & Volume|Řasenka se zahnutým kartáčkem|essence Get BIG! Lashes Curl Boost/i.test(item);
 const isSelectedMascara=item=>item===selectedMascara;
-const isShaver=item=>/^Holicí strojek(?:\\b|\\s|\\()/i.test(item);
+const isShaver=item=>/^Holicí strojek(?:\b|\s|\()/i.test(item);
 for(const [group,items] of Object.entries(shopping)){
   if(!Array.isArray(items))continue;
   shopping[group]=items.filter(item=>!isObsoleteMascara(item)&&(!isSelectedMascara(item)||group==='Косметика и уход')&&(!isShaver(item)||group==='Электроника'));
 }
-for(const [group,items] of Object.entries(customItems)){
-  if(!Array.isArray(items))continue;
-  customItems[group]=items.filter(item=>!isObsoleteMascara(item)&&(!isSelectedMascara(item)||group==='Косметика и уход')&&(!isShaver(item)||group==='Электроника'));
-}
 if(!shopping['Косметика и уход'].includes(selectedMascara))shopping['Косметика и уход'].push(selectedMascara);
 const shaver='Holicí strojek (машинка для бритья)';
 if(!shopping['Электроника'].includes(shaver))shopping['Электроника'].push(shaver);
-localStorage.setItem(customItemsKey,JSON.stringify(customItems));
 
-/* Replace CeraVe lotion with budget barrier cream, including device-local custom purchases. */
+/* Replace the default CeraVe suggestion; preserve explicit device-local purchases. */
 const barrierCream='Balea med Ultra Sensitive Barrier Protection 50 ml (109 Kč, dm)';
 const isOldCeraveLotion=item=>/cera\s*ve|cerave/i.test(item)&&/pm|facial|moistur|lotion|лосьон|крем|hydrata/i.test(item);
 Object.keys(shopping).forEach(group=>{
   shopping[group]=shopping[group].filter(item=>!isOldCeraveLotion(item));
 });
-Object.keys(customItems).forEach(group=>{
-  if(Array.isArray(customItems[group]))customItems[group]=customItems[group].filter(item=>!isOldCeraveLotion(item));
-});
 if(!shopping['Косметика и уход'].includes(barrierCream)&&!deletedItems.includes(itemId('Косметика и уход',barrierCream))){
   shopping['Косметика и уход'].push(barrierCream);
 }
-localStorage.setItem(customItemsKey,JSON.stringify(customItems));
 const homeForks='Vidličky (вилки)';
 if(!shopping['Дом'].includes(homeForks)&&!deletedItems.includes(itemId('Дом',homeForks)))shopping['Дом'].push(homeForks);
 const wardrobeLavender='Levandulové sáčky do skříně proti molům (лаванда для шкафа от моли)';
@@ -845,6 +827,61 @@ const scentedSoftener='Voňavá aviváž na prádlo (ароматный опол
 if(!shopping['Дом'].includes(scentedSoftener)&&!deletedItems.includes(itemId('Дом',scentedSoftener)))shopping['Дом'].push(scentedSoftener);
 const fourLargePlates='Velké talíře – 4 ks (4 большие тарелки)';
 if(!shopping['Дом'].includes(fourLargePlates)&&!deletedItems.includes(itemId('Дом',fourLargePlates)))shopping['Дом'].push(fourLargePlates);
+
+// Reconcile after all defaults, so no later initializer can resurrect deleted items.
+const retiredShoppingGroups=new Set(['Купить в ближайшее время','Плановые покупки по надобности','Продукты — рамен','Срочно купить',todayShoppingGroup]);
+const manualCategories=new Map();
+Object.entries(customItems).forEach(([group,items])=>items.forEach(item=>{
+  const destination=retiredShoppingGroups.has(group)?(group===todayShoppingGroup?'Дом':categoryForItem(item,group)):group;
+  if(!shopping[destination])shopping[destination]=[];
+  const id=itemId('',item);
+  const existing=manualCategories.get(id);
+  if(!existing||!retiredShoppingGroups.has(group))manualCategories.set(id,{group:destination,item});
+}));
+for(const {group,item} of manualCategories.values())shopping[group].push(item);
+const seenShoppingIds=new Set();
+Object.keys(shopping).forEach(group=>{
+  shopping[group]=shopping[group].filter(item=>{
+    const id=itemId(group,item),manual=manualCategories.get(id);
+    if(deletedItems.includes(id)||manual&&manual.group!==group||seenShoppingIds.has(id))return false;
+    seenShoppingIds.add(id);return true;
+  });
+});
+// Historical purchased defaults also need a destination when unchecked.
+for(const item of [...shopping['Куплено / уже есть']]){
+  const destination=categoryForItem(item,'Дом');
+  shopping['Куплено / уже есть']=shopping['Куплено / уже есть'].filter(x=>x!==item);
+  shopping[destination].push(item);
+}
+function deleteShoppingItem(group,item){
+  const id=itemId(group,item);
+  deletedItems=[...new Set([...deletedItems,id])];
+  writeHubStorage(deletedItemsKey,deletedItems);
+  Object.keys(shopping).forEach(category=>shopping[category]=shopping[category].filter(x=>itemId(category,x)!==id));
+  Object.keys(customItems).forEach(category=>customItems[category]=customItems[category].filter(x=>itemId(category,x)!==id));
+  writeHubStorage(customItemsKey,customItems);
+  recipeAdded=recipeAdded.filter(x=>itemId('',x)!==id);writeHubStorage(recipeAddedKey,recipeAdded);
+  // Keep the purchase history; the tombstone controls visibility.
+  renderShopping();renderToday();
+}
+function addShoppingItem(group,item){
+  const id=itemId(group,item);
+  Object.keys(shopping).forEach(category=>shopping[category]=shopping[category].filter(x=>itemId(category,x)!==id));
+  Object.keys(customItems).forEach(category=>customItems[category]=customItems[category].filter(x=>itemId(category,x)!==id));
+  shopping[group].push(item);customItems[group]=customItems[group]||[];customItems[group].push(item);
+  writeHubStorage(customItemsKey,customItems);
+  // Only an explicit user addition can revive a deleted purchase.
+  deletedItems=deletedItems.filter(oldId=>normalizedStoredId(oldId)!==id);writeHubStorage(deletedItemsKey,deletedItems);
+  saved[id]=false;writeHubStorage(key,saved);
+}
+function moveShoppingItem(group,item,destination){
+  if(!shopping[destination]||deletedItems.includes(itemId(group,item)))return false;
+  const id=itemId(group,item);
+  Object.keys(shopping).forEach(category=>shopping[category]=shopping[category].filter(x=>itemId(category,x)!==id));
+  Object.keys(customItems).forEach(category=>customItems[category]=customItems[category].filter(x=>itemId(category,x)!==id));
+  shopping[destination].push(item);customItems[destination]=customItems[destination]||[];customItems[destination].push(item);
+  const stored=writeHubStorage(customItemsKey,customItems);renderShopping();return stored;
+}
 
 function setFilterButton(filter){
   document.querySelectorAll('[data-shopfilter]').forEach(x=>x.classList.toggle('active',x.dataset.shopfilter===filter));
@@ -857,14 +894,16 @@ function showShopToast(group,item,checked){
   clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),3500);
 }
 function setShopState(group,item,checked,withToast=true){
-  const id=itemId(group,item);saved[id]=checked;localStorage.setItem(key,JSON.stringify(saved));
+  const id=itemId(group,item);saved[id]=checked;writeHubStorage(key,saved);
   if(withToast) showShopToast(group,item,checked);
   renderShopping();renderToday();
 }
+function shoppingChecked(group,item){const value=saved[itemId(group,item)];return typeof value==='boolean'?value:presetDone.has(item)}
+function escapeShoppingText(value){return value.replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]))}
 function allShoppingRows(){
   const rows=[];
   Object.entries(shopping).forEach(([group,items])=>items.forEach(item=>{
-    const id=itemId(group,item);const checked=saved[id] ?? presetDone.has(item);
+    const id=itemId(group,item);const checked=shoppingChecked(group,item);
     rows.push({group,item,id,checked});
   }));
   return rows;
@@ -880,7 +919,7 @@ function renderDoneOnly(root,term){
   const content=wrap.querySelector('.collapse-content');
   done.forEach(x=>{
     const row=document.createElement('div');row.className='item done';
-    row.innerHTML=`<input type="checkbox" id="done-${x.id}" checked><label for="done-${x.id}">${shoppingDisplayName(x.group,x.item)}<div class="small" style="margin-top:3px">${x.group}</div></label>`;
+    row.innerHTML=`<input type="checkbox" id="done-${x.id}" checked><label for="done-${x.id}">${escapeShoppingText(shoppingDisplayName(x.group,x.item))}<div class="small" style="margin-top:3px">${escapeShoppingText(x.group)}</div></label>`;
     row.querySelector('input').addEventListener('change',e=>setShopState(x.group,x.item,e.target.checked));
     content.appendChild(row);
   });
@@ -898,22 +937,22 @@ function renderShopping(){
       if(group==='Куплено / уже есть' && shopFilter==='open') return;
       const wrap=document.createElement('div');wrap.className='card';
       const badge=group===todayShoppingGroup?'<span class="badge now">сегодня</span>':group==='Купить в ближайшее время'?'<span class="badge now">сейчас</span>':group==='Плановые покупки по надобности'?'<span class="badge later">планово</span>':'';
-      wrap.innerHTML=`<div class="group-head"><button class="collapse-btn"><h3>${group==='Продукты — обычные'?'Продукты':group}${badge}</h3><span>⌄</span></button><button class="add-item-btn" type="button">+ Добавить</button><button class="delete-mode-btn" type="button">${deleteModeGroups.has(group)?'Готово':'Удалить'}</button></div><div class="collapse-content"></div>`;
+      wrap.innerHTML=`<div class="group-head"><button class="collapse-btn"><h3>${escapeShoppingText(group==='Продукты — обычные'?'Продукты':group)}${badge}</h3><span>⌄</span></button><button class="add-item-btn" type="button">+ Добавить</button><button class="delete-mode-btn" type="button">${deleteModeGroups.has(group)?'Готово':'Удалить'}</button></div><div class="collapse-content"></div>`;
       wrap.querySelector('.add-item-btn').addEventListener('click',e=>{e.stopPropagation();openAddItemSheet(group)});
       const content=wrap.querySelector('.collapse-content');
       wrap.querySelector('.delete-mode-btn').addEventListener('click',e=>{e.stopPropagation();if(deleteModeGroups.has(group))deleteModeGroups.delete(group);else deleteModeGroups.add(group);renderShopping()});
       let visible=0;
       items.forEach(item=>{
-        const id=itemId(group,item); const checked=saved[id] ?? presetDone.has(item);
+        const id=itemId(group,item); const checked=shoppingChecked(group,item);
         if(term && !item.toLowerCase().includes(term)) return;
         if(shopFilter==='open' && checked) return;
         visible++;
         const row=document.createElement('div');row.className='item'+(checked?' done':'');
         if(deleteModeGroups.has(group)){
-          row.innerHTML=`<button class="delete-item-btn" type="button" aria-label="Удалить">−</button><label>${shoppingDisplayName(group,item)}</label>`;
-          row.querySelector('.delete-item-btn').addEventListener('click',()=>{shopping[group]=shopping[group].filter(x=>x!==item);if(!deletedItems.includes(id)){deletedItems.push(id);localStorage.setItem(deletedItemsKey,JSON.stringify(deletedItems))}if(customItems[group]){customItems[group]=customItems[group].filter(x=>x!==item);if(!customItems[group].length)delete customItems[group];localStorage.setItem(customItemsKey,JSON.stringify(customItems))}delete saved[id];localStorage.setItem(key,JSON.stringify(saved));recipeAdded=recipeAdded.filter(x=>x!==item);localStorage.setItem(recipeAddedKey,JSON.stringify(recipeAdded));renderShopping();renderToday()});
+          row.innerHTML=`<button class="delete-item-btn" type="button" aria-label="Удалить">−</button><label>${escapeShoppingText(shoppingDisplayName(group,item))}</label>`;
+          row.querySelector('.delete-item-btn').addEventListener('click',()=>deleteShoppingItem(group,item));
         }else{
-          row.innerHTML=`<input type="checkbox" id="${id}" ${checked?'checked':''}><label for="${id}">${shoppingDisplayName(group,item)}</label>`;
+          row.innerHTML=`<input type="checkbox" id="${id}" ${checked?'checked':''}><label for="${id}">${escapeShoppingText(shoppingDisplayName(group,item))}</label>`;
           row.querySelector('input').addEventListener('change',e=>setShopState(group,item,e.target.checked));
         }
         content.appendChild(row);
@@ -927,7 +966,7 @@ function renderShopping(){
   let activeCount=0;
   Object.entries(shopping).forEach(([group,items])=>{
     if(group==='Куплено / уже есть')return;
-    items.forEach(item=>{if(!(saved[itemId(group,item)] ?? false))activeCount++});
+    items.forEach(item=>{if(!(shoppingChecked(group,item)))activeCount++});
   });
   const counter=document.getElementById('activeShopCount'); if(counter) counter.textContent=activeCount;
 }
@@ -948,9 +987,7 @@ document.getElementById('addItemForm').addEventListener('submit',e=>{
   const group=addItemGroup;const input=document.getElementById('newShopItem');const item=input.value.trim();if(!item){input.focus();return}
   const duplicate=shopping[group].some(x=>x.toLocaleLowerCase('ru-RU')===item.toLocaleLowerCase('ru-RU'));
   if(duplicate){input.setCustomValidity('Такой пункт уже есть в этой категории');input.reportValidity();input.addEventListener('input',()=>input.setCustomValidity(''),{once:true});return}
-  shopping[group].push(item);customItems[group]=customItems[group]||[];customItems[group].push(item);
-  localStorage.setItem(customItemsKey,JSON.stringify(customItems));
-  const id=itemId(group,item);saved[id]=false;localStorage.setItem(key,JSON.stringify(saved));
+  addShoppingItem(group,item);
   closeAddItemSheet();renderShopping();renderToday();
 });
 document.getElementById('addCaesarToShopping').addEventListener('click',addCaesarMissingToShopping);
@@ -1100,7 +1137,7 @@ const czechWords=[
 // Daily-use vocabulary for cards; full dictionary stays available in the word list.
 const everydayCzechKeys=new Set(["žízeň","příbor","lžíce","vidlička","nůž","lžička","talíř","sklenice","ubrousek","miska","hrnek","tričko","kalhoty","sukně","šaty","bunda","boty","spěchat","spravit","upravit","doporučovat","najít","začít","žádat","smůla","vztek","hodný","příjemný","stihnout","zapomenout","pamatovat si","potřebovat","vyzvednout","objednat se","zrušit","domluvit se","čekat","vysvětlit","zopakovat","rozumět","zvládnout","zkusit","platit","účtenka","sleva","volno","obsazeno","příště","hned","pozdě","brzy","ještě","už","stačit","vadit","bolet","půjčit si"]);
 const czechReviewKey='myhub-czech-review-v1';
-let czechReview={};try{czechReview=JSON.parse(localStorage.getItem(czechReviewKey)||'{}')}catch(e){czechReview={}}
+let czechReview=readHubStorage(czechReviewKey,{},isRecord);
 const reviewIntervals=[1,3,7,14,30,60];
 let czechDeck=czechWords.filter(w=>everydayCzechKeys.has(w.cz));
 let czechCardIndex=0;
@@ -1142,7 +1179,7 @@ function toggleCzechCard(){czechCardRevealed=!czechCardRevealed;renderCzechCard(
 function moveCzechCard(delta){czechCardIndex=(czechCardIndex+delta+czechDeck.length)%czechDeck.length;czechCardRevealed=false;renderCzechCard()}
 function shuffleCzechDeck(){for(let i=czechDeck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[czechDeck[i],czechDeck[j]]=[czechDeck[j],czechDeck[i]]}czechCardIndex=0;czechCardRevealed=false;renderCzechCard()}
 
-function wordReviewState(cz){return czechReview[cz]||{level:0,next:0,hard:0,known:0}}
+function wordReviewState(cz){return isRecord(czechReview[cz])?czechReview[cz]:{level:0,next:0,hard:0,known:0}}
 function buildReviewQueue(){
   const nowTs=Date.now();
   const due=czechWords.filter(w=>(wordReviewState(w.cz).next||0)<=nowTs);
@@ -1177,7 +1214,7 @@ function rateReview(kind){
   if(kind==='again'){st.level=0;st.hard=(st.hard||0)+1;st.next=Date.now()+10*60*1000}
   if(kind==='hard'){st.level=Math.max(0,Math.min(st.level||0,1));st.hard=(st.hard||0)+1;st.next=Date.now()+day}
   if(kind==='good'){st.level=Math.min((st.level||0)+1,reviewIntervals.length);st.known=(st.known||0)+1;st.hard=Math.max(0,(st.hard||0)-1);const days=reviewIntervals[Math.max(0,st.level-1)]||60;st.next=Date.now()+days*day}
-  czechReview[w.cz]=st;localStorage.setItem(czechReviewKey,JSON.stringify(czechReview));
+  czechReview[w.cz]=st;writeHubStorage(czechReviewKey,czechReview);
   reviewQueue.splice(reviewIndex,1);
   if(kind==='again')reviewQueue.push(w);
   if(reviewIndex>=reviewQueue.length)reviewIndex=0;
@@ -1229,7 +1266,7 @@ document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=
 
 renderShopping();renderCareBlock('careMe',careMe);renderCareBlock('careNikita',careNikita);renderWorkouts();renderToday();renderReviewStats();
 </script>
-<script src="home-dashboard.js?v=13"></script>
+<script src="home-dashboard.js?v=14"></script>
 <script>
 /* Explicit shopping panel order independent of category/object insertion order. */
 (function(){

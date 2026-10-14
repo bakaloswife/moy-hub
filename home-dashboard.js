@@ -4,8 +4,8 @@
 const root=document.getElementById('todayCard');
 if(!root||typeof workouts==='undefined'||typeof careMe==='undefined'||typeof czechWords==='undefined')return;
 const make=(tag,cls,text)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el};
-const store=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value))}catch(e){console.warn('Unable to store data',e)}};
-const read=(key)=>{try{return JSON.parse(localStorage.getItem(key)||'null')}catch(e){return null}};
+const store=writeHubStorage;
+const read=(key,valid=isRecord)=>readHubStorage(key,null,valid);
 const playlists={
   stretching:{name:'Стретчинг',url:'https://youtube.com/playlist?list=PLKandqretRBY&si=A1HoLVZjWWn9Cl9d'},
   mobility:{name:'Мобилити',url:'https://youtube.com/playlist?list=PLVV4y7K6QDmM&si=blP4zf8WDnGvAM0f'},
@@ -108,13 +108,14 @@ card.addEventListener('click',()=>{revealed=!revealed;paintWord()});
 nextWord.addEventListener('click',nextCzechWord);
 nextCzechWord();
 const notesKey='myhub-home-notes-v1',draftKey='myhub-home-note-draft-v1';
-let notes=read(notesKey);if(!Array.isArray(notes))notes=[];
+let notes=read(notesKey,Array.isArray);if(!Array.isArray(notes))notes=[];
 try{draft.value=localStorage.getItem(draftKey)||''}catch(e){}
 draft.addEventListener('input',()=>{try{localStorage.setItem(draftKey,draft.value)}catch(e){}});
 function drawNotes(){
 notesList.replaceChildren();
 if(!notes.length)notesList.append(make('div','home-empty','Пока нет заметок'));
 notes.forEach((note,i)=>{
+if(!isRecord(note)||typeof note.text!=='string')return;
 const row=make('div','home-row');
 const txt=make('span','home-row-text',note.text);txt.contentEditable='true';txt.setAttribute('role','textbox');txt.setAttribute('aria-label','Редактировать заметку');txt.setAttribute('tabindex','0');
 txt.addEventListener('input',()=>{note.text=txt.textContent;store(notesKey,notes)});
@@ -132,7 +133,7 @@ const routineMorning=[
 const routineEvening=[
   ['📚','Языки'],['🎮','Свободное время'],['💊','Принять таблетки'],['💧','Умыться']
 ];
-let planItems=read(planKey);
+let planItems=read(planKey,Array.isArray);
 if(!Array.isArray(planItems))planItems=[];
 const safeTime=t=>typeof t==='string'&&/^([01]\d|2[0-3]):[0-5]\d$/.test(t)?t:'';
 const minutes=t=>{const p=t.split(':').map(Number);return p[0]*60+p[1]};
@@ -150,12 +151,12 @@ function makePlanRow(item){
   const edit=make('button','home-remove','✎');edit.type='button';edit.setAttribute('aria-label','Изменить время или дату');
   edit.addEventListener('click',()=>{planName.value=item.text;planTime.value=item.time||'';planDate.value=item.date||'';editingPlanId=item.id;openPlanForm()});
   const del=make('button','home-remove','×');del.type='button';del.setAttribute('aria-label','Удалить план');
-  del.addEventListener('click',()=>{planItems=planItems.filter(p=>p.id!==item.id);store(planKey,planItems);renderDayPlan()});
+  del.addEventListener('click',()=>{planItems=planItems.filter(p=>!isRecord(p)||p.id!==item.id);store(planKey,planItems);renderDayPlan()});
   row.append(title,edit,del);return row;
 }
 function renderDayPlan(){
   const today=dayKey();
-  const shown=planItems.filter(item=>!item.date||item.date===today);
+  const shown=planItems.filter(item=>isRecord(item)&&typeof item.text==='string'&&(!item.date||item.date===today));
   const byTime=shown.filter(item=>safeTime(item.time)).sort((a,b)=>a.time.localeCompare(b.time));
   drawRoutine(dayPlanMorning,'☀️ Утро · до 16:00',routineMorning,byTime.filter(item=>minutes(item.time)<16*60));
   drawRoutine(dayPlanEvening,'🌙 Вечер · после 16:00',routineEvening,byTime.filter(item=>minutes(item.time)>=16*60));
@@ -173,7 +174,7 @@ planCancel.addEventListener('click',closePlanForm);
 planSave.addEventListener('click',()=>{
   const name=planName.value.trim();if(!name)return;
   const tm=planTime.value;const date=planDate.value;
-  if(editingPlanId!==null){const item=planItems.find(p=>p.id===editingPlanId);if(item)Object.assign(item,{text:name,time:tm,date})}
+  if(editingPlanId!==null){const item=planItems.find(p=>isRecord(p)&&p.id===editingPlanId);if(item)Object.assign(item,{text:name,time:tm,date})}
   else planItems.push({id:String(Date.now())+'-'+Math.random().toString(36).slice(2),text:name,time:tm,date});
   store(planKey,planItems);closePlanForm();renderDayPlan();
 });
