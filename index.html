@@ -778,21 +778,15 @@ shopping['Одежда']=pragueClothingList.slice();
 customItems['Одежда']=[];
 localStorage.setItem(customItemsKey,JSON.stringify(customItems));
 
-/* Current Prague shopping checklist; preserve prior urgent items in their categories. */
+/* Preserve existing shopping categories without regenerating the temporary Prague trip list. */
 const todayShoppingGroup='Сегодняшний план покупок';
 (shopping['Срочно купить']||[]).forEach(item=>{
- const destination=item.startsWith('Malá powerbanka')?'Электроника':'Косметика и уход';
- if(!shopping[destination].includes(item))shopping[destination].push(item);
+  const destination=item.startsWith('Malá powerbanka')?'Электроника':'Косметика и уход';
+  if(!shopping[destination].includes(item))shopping[destination].push(item);
 });
 delete shopping['Срочно купить'];
-shopping[todayShoppingGroup]=[
- ...pragueClothingList,
- 'Lékárna: vzorky SPF a hydratačních krémů',
- 'Lékárna: dělička tablet na čtyři části',
- 'Lékárna: laktáza (enzym laktáza, přibližně 6000 FCC)'
-];
-shopping['Одежда']=['Domácí top — Primark'];
-customItems['Одежда']=[];
+delete shopping[todayShoppingGroup];
+delete customItems[todayShoppingGroup];
 localStorage.setItem(customItemsKey,JSON.stringify(customItems));
 
 /* Keep mascara under cosmetics, including previously saved custom items. */
@@ -977,14 +971,9 @@ const workouts={
 function renderWorkouts(){const root=document.getElementById('workoutDays');root.innerHTML='';[1,2,3,4,5,6,0].forEach(d=>{const w=workouts[d];const el=document.createElement('div');el.className='day'+(now.getDay()===d?' today':'');el.innerHTML=`<div class="day-head"><div><div class="day-name">${DOW[d]}${now.getDay()===d?' <span class="badge now">сегодня</span>':''}</div><div class="day-meta">${w.title}</div></div><div class="day-meta">${w.dur||''}</div></div>${w.video?`<a class="video" ${w.url?`href="${w.url}" target="_blank"`:''}><div class="video-title">${w.video}</div><div class="video-meta">${w.author}</div>${w.url?'<div class="video-link">Открыть видео ↗</div>':''}</a>`:''}<div class="note">${w.note}</div>`;root.appendChild(el)})}
 
 function renderToday(){
- const d=now.getDay(); const w=workouts[d];
- let nearest=[]; (shopping[todayShoppingGroup]||[]).forEach(item=>{const id=itemId(todayShoppingGroup,item);const checked=saved[id]??false;if(!checked)nearest.push(item)});
- const c=careMe[d];
- const preview=nearest.slice(0,4).map(x=>`• ${x}`).join('<br>');
- const more=nearest.length>4?`<div class="small" style="margin-top:6px">+ ещё ${nearest.length-4}</div>`:'';
- document.getElementById('todayCard').innerHTML=`<h2>Сегодня</h2><div class="steps"><div class="step"><b>Уход вечером:</b> ${c[1].replace(/^Вечер:\s*/,'')}</div><div class="step"><b>Тренировка:</b> ${w.title}${w.video?' — '+w.video:''}</div><div class="step"><b>Сегодняшний план покупок:</b><div style="margin-top:6px;line-height:1.5">${preview||'План выполнен'}</div>${more}</div></div>`;
+ const d=now.getDay(); const w=workouts[d]; const c=careMe[d];
+ document.getElementById('todayCard').innerHTML=`<h2>Сегодня</h2><div class="steps"><div class="step"><b>Уход вечером:</b> ${c[1].replace(/^Вечер:\\s*/,'')}</div><div class="step"><b>Тренировка:</b> ${w.title}${w.video?' — '+w.video:''}</div></div>`;
 }
-
 
 const czechWords=[
   {cz:'smůla',ru:'невезение, неудача',note:'эмоции и выражения'},
@@ -1221,7 +1210,7 @@ renderShopping();renderCareBlock('careMe',careMe);renderCareBlock('careNikita',c
 <script>
 /* Explicit shopping panel order independent of category/object insertion order. */
 (function(){
-  const desired=['Сегодняшний план покупок','Продукты','Косметика и уход','Ногти','Электроника','Одежда','Дом','Куплено / уже есть'];
+  const desired=['Продукты','Косметика и уход','Ногти','Электроника','Одежда','Дом','Куплено / уже есть'];
   const root=document.getElementById('shoppingGroups');
   function sortShopping(){
     if(!root)return;
@@ -1245,9 +1234,8 @@ renderShopping();renderCareBlock('careMe',careMe);renderCareBlock('careNikita',c
     const find=label=>panels.find(panel=>panel.querySelector('summary')?.textContent.includes(label));
     const reminders=find('Дневной план');
     const notes=find('Заметки');
-    const urgent=find('Сегодняшний план покупок');
-    if(reminders&&notes&&urgent){
-      layout.append(reminders,notes,urgent);
+    if(reminders&&notes){
+      layout.append(reminders,notes);
     }
   }
   arrangeHome();
