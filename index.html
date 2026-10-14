@@ -824,6 +824,8 @@ const wardrobeLavender='Levandulové sáčky do skříně proti molům (лава
 if(!shopping['Дом'].includes(wardrobeLavender)&&!deletedItems.includes(itemId('Дом',wardrobeLavender)))shopping['Дом'].push(wardrobeLavender);
 const scentedSoftener='Voňavá aviváž na prádlo (ароматный ополаскиватель для белья)';
 if(!shopping['Дом'].includes(scentedSoftener)&&!deletedItems.includes(itemId('Дом',scentedSoftener)))shopping['Дом'].push(scentedSoftener);
+const fourLargePlates='Velké talíře – 4 ks (4 большие тарелки)';
+if(!shopping['Дом'].includes(fourLargePlates)&&!deletedItems.includes(itemId('Дом',fourLargePlates)))shopping['Дом'].push(fourLargePlates);
 
 function setFilterButton(filter){
   document.querySelectorAll('[data-shopfilter]').forEach(x=>x.classList.toggle('active',x.dataset.shopfilter===filter));
