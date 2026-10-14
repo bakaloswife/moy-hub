@@ -972,7 +972,7 @@ function renderWorkouts(){const root=document.getElementById('workoutDays');root
 
 function renderToday(){
  const d=now.getDay(); const w=workouts[d]; const c=careMe[d];
- document.getElementById('todayCard').innerHTML=`<h2>Сегодня</h2><div class="steps"><div class="step"><b>Уход вечером:</b> ${c[1].replace(/^Вечер:\\s*/,'')}</div><div class="step"><b>Тренировка:</b> ${w.title}${w.video?' — '+w.video:''}</div></div>`;
+ document.getElementById('todayCard').innerHTML=`<h2>Сегодня</h2><div class="steps"><div class="step"><b>Уход вечером:</b> ${c[1].replace(/^Вечер:\s*/,'')}</div><div class="step"><b>Тренировка:</b> ${w.title}${w.video?' — '+w.video:''}</div></div>`;
 }
 
 const czechWords=[
@@ -1206,7 +1206,7 @@ document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=
 
 renderShopping();renderCareBlock('careMe',careMe);renderCareBlock('careNikita',careNikita);renderWorkouts();renderToday();renderReviewStats();
 </script>
-<script src="home-dashboard.js?v=11"></script>
+<script src="home-dashboard.js?v=12"></script>
 <script>
 /* Explicit shopping panel order independent of category/object insertion order. */
 (function(){
