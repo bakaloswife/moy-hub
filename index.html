@@ -807,7 +807,7 @@ if(Array.isArray(customItems['Дом'])){
 }
 /* Normalize the selected mascara and move the shaver into Electronics.
    Also clean device-local shopping entries so legacy categories cannot re-add them. */
-const selectedMascara='Catrice Glam & Doll Volume Brown Waterproof (119 Kč)';
+const selectedMascara='Tmavě hnědá řasenka se zahnutým kartáčkem (тёмно-коричневая тушь с изогнутой щёточкой)';
 const isObsoleteMascara=item=>/Catrice Glam & Doll Curl & Volume|Řasenka se zahnutým kartáčkem|essence Get BIG! Lashes Curl Boost/i.test(item);
 const isSelectedMascara=item=>item===selectedMascara;
 const isShaver=item=>/^Holicí strojek(?:\\b|\\s|\\()/i.test(item);
