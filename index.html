@@ -811,6 +811,19 @@ if(Array.isArray(customItems['Дом'])){
     localStorage.setItem(customItemsKey,JSON.stringify(customItems));
   }
 }
+/* Replace CeraVe lotion with budget barrier cream, including device-local custom purchases. */
+const barrierCream='Balea med Ultra Sensitive Barrier Protection 50 ml (109 Kč, dm)';
+const isOldCeraveLotion=item=>/cera\s*ve|cerave/i.test(item)&&/pm|facial|moistur|lotion|лосьон|крем|hydrata/i.test(item);
+Object.keys(shopping).forEach(group=>{
+  shopping[group]=shopping[group].filter(item=>!isOldCeraveLotion(item));
+});
+Object.keys(customItems).forEach(group=>{
+  if(Array.isArray(customItems[group]))customItems[group]=customItems[group].filter(item=>!isOldCeraveLotion(item));
+});
+if(!shopping['Косметика и уход'].includes(barrierCream)&&!deletedItems.includes(itemId('Косметика и уход',barrierCream))){
+  shopping['Косметика и уход'].push(barrierCream);
+}
+localStorage.setItem(customItemsKey,JSON.stringify(customItems));
 const homeForks='Vidličky (вилки)';
 if(!shopping['Дом'].includes(homeForks)&&!deletedItems.includes(itemId('Дом',homeForks)))shopping['Дом'].push(homeForks);
 const wardrobeLavender='Levandulové sáčky do skříně proti molům (лаванда для шкафа от моли)';
