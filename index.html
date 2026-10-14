@@ -805,6 +805,25 @@ if(Array.isArray(customItems['Дом'])){
     localStorage.setItem(customItemsKey,JSON.stringify(customItems));
   }
 }
+/* Normalize the selected mascara and move the shaver into Electronics.
+   Also clean device-local shopping entries so legacy categories cannot re-add them. */
+const selectedMascara='Catrice Glam & Doll Volume Brown Waterproof (119 Kč)';
+const isObsoleteMascara=item=>/Catrice Glam & Doll Curl & Volume|Řasenka se zahnutým kartáčkem|essence Get BIG! Lashes Curl Boost/i.test(item);
+const isSelectedMascara=item=>item===selectedMascara;
+const isShaver=item=>/^Holicí strojek(?:\\b|\\s|\\()/i.test(item);
+for(const [group,items] of Object.entries(shopping)){
+  if(!Array.isArray(items))continue;
+  shopping[group]=items.filter(item=>!isObsoleteMascara(item)&&(!isSelectedMascara(item)||group==='Косметика и уход')&&(!isShaver(item)||group==='Электроника'));
+}
+for(const [group,items] of Object.entries(customItems)){
+  if(!Array.isArray(items))continue;
+  customItems[group]=items.filter(item=>!isObsoleteMascara(item)&&(!isSelectedMascara(item)||group==='Косметика и уход')&&(!isShaver(item)||group==='Электроника'));
+}
+if(!shopping['Косметика и уход'].includes(selectedMascara))shopping['Косметика и уход'].push(selectedMascara);
+const shaver='Holicí strojek (машинка для бритья)';
+if(!shopping['Электроника'].includes(shaver))shopping['Электроника'].push(shaver);
+localStorage.setItem(customItemsKey,JSON.stringify(customItems));
+
 /* Replace CeraVe lotion with budget barrier cream, including device-local custom purchases. */
 const barrierCream='Balea med Ultra Sensitive Barrier Protection 50 ml (109 Kč, dm)';
 const isOldCeraveLotion=item=>/cera\s*ve|cerave/i.test(item)&&/pm|facial|moistur|lotion|лосьон|крем|hydrata/i.test(item);
