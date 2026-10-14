@@ -69,8 +69,6 @@ const notesPanel=panel('📝 Заметки',false);
 const draft=make('textarea','home-field');draft.rows=3;draft.placeholder='Записать мысль…';notesPanel.append(draft);
 const addNote=make('button','chip home-action','Сохранить заметку +');addNote.type='button';notesPanel.append(addNote);
 const notesList=make('div','home-list');notesPanel.append(notesList);
-const urgent=panel('🛒 Сегодняшний план покупок');
-const urgentList=make('div','home-list');urgent.append(urgentList);go('shopping',urgent,'Все покупки →');
 let wordIndex=0,revealed=false;
 const czechRotationKey='myhub-home-czech-rotation-v2';
 const shuffleWords=items=>{
@@ -238,15 +236,7 @@ workoutSub.textContent=d===0?'Восстановление · стретчинг
 video.href=dayPlaylist.url;
 video.textContent='▶ Открыть плейлист «'+dayPlaylist.name+'» ↗';
 careText.textContent=careDay[1].replace(/^Вечер:\s*/,'');
-urgentList.replaceChildren();
-const group='Сегодняшний план покупок',items=(shopping[group]||[]).filter(item=>!deletedItems.includes(itemId(group,item))&&!(saved[itemId(group,item)]??false));
-if(!items.length)urgentList.append(make('div','home-empty','План покупок выполнен ✓'));
-items.forEach(item=>{
-const row=make('label','home-row');
-const check=make('input');check.type='checkbox';
-const txt=make('span','home-row-text',item);row.append(check,txt);
-check.addEventListener('change',()=>{setShopState(group,item,check.checked,false)});
-urgentList.append(row);
+
 });
 }
 function replaceWorkoutVideos(){
