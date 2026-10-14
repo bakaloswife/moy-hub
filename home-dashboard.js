@@ -236,8 +236,6 @@ workoutSub.textContent=d===0?'Восстановление · стретчинг
 video.href=dayPlaylist.url;
 video.textContent='▶ Открыть плейлист «'+dayPlaylist.name+'» ↗';
 careText.textContent=careDay[1].replace(/^Вечер:\s*/,'');
-
-});
 }
 function replaceWorkoutVideos(){
   const daysRoot=document.getElementById('workoutDays');
