@@ -864,6 +864,11 @@ Object.keys(shopping).forEach(group=>{
 if(!shopping['Косметика и уход'].includes(barrierCream)&&!deletedItems.includes(itemId('Косметика и уход',barrierCream))){
   shopping['Косметика и уход'].push(barrierCream);
 }
+const darkHairShampoo='Šampon pro barvené tmavé vlasy (např. Syoss)';
+const gentleFaceCream='Balea med Ultra Sensitive Tagescreme (krém na obličej, dm)';
+for(const item of [darkHairShampoo,gentleFaceCream]){
+  if(!shopping['Косметика и уход'].includes(item)&&!deletedItems.includes(itemId('Косметика и уход',item)))shopping['Косметика и уход'].push(item);
+}
 const homeForks='Vidličky (вилки)';
 if(!shopping['Дом'].includes(homeForks)&&!deletedItems.includes(itemId('Дом',homeForks)))shopping['Дом'].push(homeForks);
 const wardrobeLavender='Levandulové sáčky do skříně proti molům (лаванда для шкафа от моли)';
