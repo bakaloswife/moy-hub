@@ -48,6 +48,9 @@ const front=make('span','home-czech-word'),meaning=make('span','home-czech-meani
 const hint=make('span','small','Нажми, чтобы увидеть перевод');card.append(front,meaning,hint);cz.append(card);
 const czBottom=make('div','home-card-bottom');czBottom.append(make('span','small','Из твоего словаря'));
 const nextWord=make('button','chip','Другое слово ↻');nextWord.type='button';czBottom.append(nextWord);cz.append(czBottom);
+const recipesShortcut=panel('🍙 Рецепты',true);
+recipesShortcut.append(make('div','home-muted','Кето-кимбап, курица по-китайски и другие рецепты.'));
+go('recipes',recipesShortcut,'Открыть все рецепты →');
 const dayPlanPanel=panel('🗓️ Дневной план',true);
 const dayPlanMorning=make('div','');const dayPlanEvening=make('div','');const dayPlanLoose=make('div','');
 const planTimer=make('div','');
